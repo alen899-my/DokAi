@@ -3,14 +3,25 @@ import { db } from '../../config/db';
 import { projects } from '../../db/schema';
 import { env } from '../../config/env';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
+import { JWTPayload } from '../../lib/jwt';
 
 const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
 
 export const getProjectById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const [project] = await db.select().from(projects).where(eq(projects.id, id));
+    const userId = (req.user as JWTPayload)?.userId;
+
+    if (!userId) {
+      res.status(401).json({ error: 'Unauthorized: No user session found' });
+      return;
+    }
+
+    const [project] = await db
+      .select()
+      .from(projects)
+      .where(and(eq(projects.id, id), eq(projects.userId, userId)));
     
     if (!project) {
        res.status(404).json({ error: 'Project not found' });
@@ -27,11 +38,23 @@ export const updateProject = async (req: Request, res: Response): Promise<void> 
   try {
     const { id } = req.params;
     const { documentData } = req.body;
+    const userId = (req.user as JWTPayload)?.userId;
+
+    if (!userId) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
     
-    await db.update(projects)
+    const [updated] = await db.update(projects)
       .set({ documentData })
-      .where(eq(projects.id, id));
+      .where(and(eq(projects.id, id), eq(projects.userId, userId)))
+      .returning();
       
+    if (!updated) {
+      res.status(404).json({ error: 'Project not found or unauthorized' });
+      return;
+    }
+
     res.status(200).json({ success: true });
   } catch (error) {
     console.error('Error updating project:', error);
@@ -41,12 +64,24 @@ export const updateProject = async (req: Request, res: Response): Promise<void> 
 
 export const getAllProjects = async (req: Request, res: Response): Promise<void> => {
   try {
-    const result = await db.select().from(projects);
+    const userId = (req.user as JWTPayload)?.userId;
+
+    if (!userId) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const result = await db
+      .select()
+      .from(projects)
+      .where(eq(projects.userId, userId));
+
     const sortedProjects = result.sort((a, b) => {
       const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
       const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
       return dateB - dateA;
     });
+
     res.status(200).json({ success: true, projects: sortedProjects });
   } catch (error) {
     console.error('Error fetching all projects:', error);
@@ -57,7 +92,23 @@ export const getAllProjects = async (req: Request, res: Response): Promise<void>
 export const deleteProject = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    await db.delete(projects).where(eq(projects.id, id));
+    const userId = (req.user as JWTPayload)?.userId;
+
+    if (!userId) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const [deleted] = await db
+      .delete(projects)
+      .where(and(eq(projects.id, id), eq(projects.userId, userId)))
+      .returning();
+
+    if (!deleted) {
+      res.status(404).json({ error: 'Project not found or unauthorized' });
+      return;
+    }
+
     res.status(200).json({ success: true });
   } catch (error) {
     console.error('Error deleting project:', error);
@@ -68,17 +119,24 @@ export const deleteProject = async (req: Request, res: Response): Promise<void> 
 export const createProject = async (req: Request, res: Response): Promise<void> => {
   try {
     const { idea, model } = req.body;
+    const userId = (req.user as JWTPayload)?.userId;
+
+    if (!userId) {
+      res.status(401).json({ error: 'Unauthorized: Missing user information' });
+      return;
+    }
 
     if (!idea) {
       res.status(400).json({ error: 'Project idea is required' });
       return;
     }
 
-    const modelName = model || 'gemini-2.5-flash';
+    const modelName = model || 'gemini-2.0-flash';
 
     const [newProject] = await db
       .insert(projects)
       .values({
+        userId,
         idea,
         modelUsed: modelName,
       })
@@ -95,10 +153,20 @@ export const streamProjectGeneration = async (req: Request, res: Response): Prom
   try {
     const { id } = req.params;
     
+    const userId = (req.user as JWTPayload)?.userId;
+    if (!userId) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
     // Fetch idea from the newly created project
-    const [existingProject] = await db.select().from(projects).where(eq(projects.id, id));
+    const [existingProject] = await db
+      .select()
+      .from(projects)
+      .where(and(eq(projects.id, id), eq(projects.userId, userId)));
+    
     if (!existingProject) {
-      res.status(404).json({ error: 'Project not found' });
+      res.status(404).json({ error: 'Project not found or unauthorized' });
       return;
     }
 
@@ -162,7 +230,7 @@ Project Idea: ${idea}`;
       .set({
         documentData: Object.keys(sections).length > 0 ? sections : { Document: generatedContent }
       })
-      .where(eq(projects.id, id));
+      .where(and(eq(projects.id, id), eq(projects.userId, userId)));
 
     res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
     res.end();

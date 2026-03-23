@@ -63,8 +63,7 @@ app.use(errorHandler);
 // ── Start server (Only if not running inside Vercel Serverless) ──
 if (!process.env.VERCEL) {
   app.listen(env.PORT, () => {
-    console.log('\n🚀 DocForge API is running');
-    console.log(`   URL:         http://localhost:${env.PORT}`);
+
   });
 }
 
