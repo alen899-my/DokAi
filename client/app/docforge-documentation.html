@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DocForge — Full Project Documentation</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────────────────
+   DESIGN TOKENS
+───────────────────────────────────────── */
+:root{
+  --bg:#07080a; --bg2:#0d0f13; --bg3:#13161c; --bg4:#191d25;
+  --surface:#1e2230; --surface2:#252a38;
+  --border:rgba(255,255,255,0.06); --border2:rgba(255,255,255,0.11); --border3:rgba(255,255,255,0.18);
+  --text:#eceef2; --text2:#8c91a0; --text3:#4f5362; --text4:#32353f;
+  --blue:#3b82f6; --blue2:#2563eb; --blue-dim:rgba(59,130,246,0.12); --blue-glow:rgba(59,130,246,0.05);
+  --teal:#14b8a6; --teal-dim:rgba(20,184,166,0.12);
+  --green:#22c55e; --green-dim:rgba(34,197,94,0.1);
+  --orange:#f97316; --orange-dim:rgba(249,115,22,0.12);
+  --purple:#a855f7; --purple-dim:rgba(168,85,247,0.12);
+  --red:#ef4444; --red-dim:rgba(239,68,68,0.1);
+  --yellow:#eab308; --yellow-dim:rgba(234,179,8,0.1);
+  --cyan:#06b6d4; --cyan-dim:rgba(6,182,212,0.12);
+  --pink:#ec4899; --pink-dim:rgba(236,72,153,0.1);
+  --fd:'Syne',sans-serif; --fb:'Instrument Sans',sans-serif; --fm:'JetBrains Mono',monospace;
+  --r:6px; --rl:10px; --rxl:16px; --t:0.15s cubic-bezier(0.4,0,0.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.6}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:3px}
+
+/* ─────────────────────────────────────────
+   LAYOUT
+───────────────────────────────────────── */
+.shell{display:flex;height:100vh;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{
+  width:260px;min-width:260px;
+  background:var(--bg2);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  flex-shrink:0;
+  position:relative;
+  z-index:10;
+}
+.sb-top{
+  padding:22px 20px 16px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+  background:linear-gradient(135deg,rgba(59,130,246,0.05) 0%,transparent 70%);
+}
+.sb-logo{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.sb-mark{
+  width:36px;height:36px;
+  background:linear-gradient(135deg,var(--blue),var(--teal));
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fm);font-size:12px;font-weight:700;color:#fff;
+  flex-shrink:0;letter-spacing:-0.04em;
+}
+.sb-name{font-family:var(--fd);font-size:17px;font-weight:800;letter-spacing:-0.03em}
+.sb-ver{font-size:10px;font-family:var(--fm);color:var(--text3)}
+.sb-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:9px;font-family:var(--fm);
+  padding:3px 8px;border-radius:20px;
+  background:var(--blue-dim);border:1px solid rgba(59,130,246,0.2);
+  color:#93c5fd;letter-spacing:0.04em;text-transform:uppercase;
+}
+.sb-body{flex:1;overflow-y:auto;padding:12px 10px}
+.sb-group-label{
+  font-size:9px;font-family:var(--fm);font-weight:600;
+  color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;
+  padding:0 10px;margin:14px 0 5px;
+}
+.sb-item{
+  display:flex;align-items:center;gap:9px;
+  padding:8px 10px;border-radius:var(--r);
+  cursor:pointer;color:var(--text2);font-size:12.5px;
+  transition:all var(--t);border:1px solid transparent;
+  position:relative;user-select:none;
+}
+.sb-item:hover{background:var(--bg3);color:var(--text);border-color:var(--border)}
+.sb-item.active{background:var(--blue-dim);color:#93c5fd;border-color:rgba(59,130,246,0.2)}
+.sb-item.active::before{
+  content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:3px;height:18px;background:var(--blue);border-radius:0 3px 3px 0;left:-10px;
+}
+.sb-item svg{width:14px;height:14px;flex-shrink:0;opacity:0.7}
+.sb-item.active svg{opacity:1}
+.sb-dot{width:5px;height:5px;border-radius:50%;position:absolute;right:10px;background:var(--blue);opacity:0;transition:opacity var(--t)}
+.sb-item.active .sb-dot{opacity:1}
+.sb-footer{padding:14px 20px;border-top:1px solid var(--border);flex-shrink:0}
+.sb-footer-text{font-size:10px;font-family:var(--fm);color:var(--text3);line-height:1.6}
+
+/* MAIN CONTENT */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{
+  height:50px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;flex-shrink:0;
+  background:rgba(7,8,10,0.8);backdrop-filter:blur(12px);
+  position:sticky;top:0;z-index:5;
+}
+.tb-breadcrumb{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text3);font-family:var(--fm)}
+.tb-sep{opacity:0.3}
+.tb-current{color:var(--text2)}
+.tb-right{display:flex;align-items:center;gap:8px}
+.tb-chip{
+  font-size:10px;font-family:var(--fm);padding:3px 9px;
+  border-radius:20px;border:1px solid var(--border2);color:var(--text3);
+}
+.tb-chip.green{background:var(--green-dim);border-color:rgba(34,197,94,0.2);color:#86efac}
+.tb-chip.blue{background:var(--blue-dim);border-color:rgba(59,130,246,0.2);color:#93c5fd}
+.content-scroll{flex:1;overflow-y:auto;padding:36px 40px 80px}
+
+/* ─────────────────────────────────────────
+   PAGES
+───────────────────────────────────────── */
+.page{display:none;animation:fadeUp 0.2s ease}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─────────────────────────────────────────
+   TYPOGRAPHY
+───────────────────────────────────────── */
+.page-eyebrow{
+  font-family:var(--fm);font-size:10px;color:var(--blue);
+  text-transform:uppercase;letter-spacing:0.1em;
+  margin-bottom:12px;display:flex;align-items:center;gap:8px;
+}
+.page-eyebrow::before{content:'';display:inline-block;width:20px;height:1px;background:var(--blue)}
+h1.page-title{
+  font-family:var(--fd);font-size:36px;font-weight:800;
+  letter-spacing:-0.03em;line-height:1.1;margin-bottom:14px;
+}
+h1.page-title span{
+  background:linear-gradient(135deg,var(--blue),var(--teal));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.page-lead{font-size:14px;color:var(--text2);line-height:1.75;max-width:680px;margin-bottom:32px}
+h2{font-family:var(--fd);font-size:20px;font-weight:700;letter-spacing:-0.02em;margin:36px 0 12px}
+h3{font-family:var(--fd);font-size:15px;font-weight:600;letter-spacing:-0.01em;margin:28px 0 10px;color:var(--text)}
+h4{font-size:13px;font-weight:600;margin:16px 0 8px;color:var(--text2)}
+p{font-size:13.5px;color:var(--text2);line-height:1.75;margin-bottom:12px}
+code{font-family:var(--fm);font-size:0.87em;background:var(--surface);color:var(--teal);padding:1px 6px;border-radius:4px;border:1px solid var(--border)}
+.divider{height:1px;background:var(--border);margin:32px 0}
+
+/* ─────────────────────────────────────────
+   COMPONENTS
+───────────────────────────────────────── */
+
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:36px}
+.stat-card{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:var(--rxl);padding:18px 20px;
+  position:relative;overflow:hidden;transition:border-color var(--t);
+}
+.stat-card:hover{border-color:var(--border2)}
+.stat-card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--blue),transparent);opacity:0.6;
+}
+.stat-label{font-size:9px;font-family:var(--fm);color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}
+.stat-val{font-family:var(--fd);font-size:20px;font-weight:700;margin-bottom:3px}
+.stat-sub{font-size:11px;color:var(--text3)}
+
+/* INFO BOXES */
+.info-box,.warn-box,.success-box,.danger-box{
+  border-radius:var(--rl);padding:12px 16px;font-size:12.5px;line-height:1.65;margin-bottom:20px;
+}
+.info-box{background:var(--blue-dim);border:1px solid rgba(59,130,246,0.2);border-left:3px solid var(--blue);color:#93c5fd}
+.warn-box{background:var(--yellow-dim);border:1px solid rgba(234,179,8,0.2);border-left:3px solid var(--yellow);color:#fde047}
+.success-box{background:var(--green-dim);border:1px solid rgba(34,197,94,0.2);border-left:3px solid var(--green);color:#86efac}
+.danger-box{background:var(--red-dim);border:1px solid rgba(239,68,68,0.2);border-left:3px solid var(--red);color:#fca5a5}
+
+/* CODE BLOCK */
+.code-block{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rxl);overflow:hidden;margin:14px 0 24px}
+.cb-head{display:flex;align-items:center;padding:9px 16px;background:var(--bg3);border-bottom:1px solid var(--border)}
+.cb-dots{display:flex;gap:5px}
+.cbd{width:10px;height:10px;border-radius:50%}
+.cbd.r{background:#ff5f57}.cbd.y{background:#ffbd2e}.cbd.g{background:#28c840}
+.cb-lang{flex:1;text-align:right;font-family:var(--fm);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em}
+.code-block pre{padding:18px 20px;font-family:var(--fm);font-size:12px;line-height:1.7;color:#94a878;overflow-x:auto;white-space:pre}
+
+/* TAGS / BADGES */
+.tag{display:inline-flex;align-items:center;font-size:10px;font-family:var(--fm);padding:3px 9px;border-radius:20px;border:1px solid;margin-right:5px;margin-bottom:5px;font-weight:400}
+.tag-blue{background:var(--blue-dim);color:#93c5fd;border-color:rgba(59,130,246,0.2)}
+.tag-teal{background:var(--teal-dim);color:#5eead4;border-color:rgba(20,184,166,0.2)}
+.tag-green{background:var(--green-dim);color:#86efac;border-color:rgba(34,197,94,0.2)}
+.tag-orange{background:var(--orange-dim);color:#fdba74;border-color:rgba(249,115,22,0.2)}
+.tag-purple{background:var(--purple-dim);color:#d8b4fe;border-color:rgba(168,85,247,0.2)}
+.tag-gray{background:var(--surface);color:var(--text2);border-color:var(--border2)}
+.tag-red{background:var(--red-dim);color:#fca5a5;border-color:rgba(239,68,68,0.2)}
+.tag-cyan{background:var(--cyan-dim);color:#67e8f9;border-color:rgba(6,182,212,0.2)}
+.tags-row{display:flex;flex-wrap:wrap;margin-bottom:16px}
+
+/* CARDS GRID */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:32px}
+.card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rxl);padding:18px 20px;transition:all var(--t)}
+.card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.card-label{font-size:9px;font-family:var(--fm);color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px}
+.card-title{font-size:14px;font-weight:500;margin-bottom:6px}
+.card-desc{font-size:12px;color:var(--text2);line-height:1.6}
+
+/* ROLE CARDS */
+.role-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:28px}
+.role-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rxl);padding:18px 20px;transition:all var(--t)}
+.role-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.role-avatar{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:13px;font-weight:600;margin-bottom:12px}
+.role-name{font-size:14px;font-weight:600;margin-bottom:6px}
+.role-desc{font-size:12px;color:var(--text2);line-height:1.6}
+
+/* DB SCHEMA */
+.db-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-bottom:28px}
+.db-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rxl);overflow:hidden;transition:border-color var(--t)}
+.db-card:hover{border-color:var(--border2)}
+.db-head{padding:10px 14px;font-family:var(--fm);font-size:12px;font-weight:500;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.db-row{display:flex;justify-content:space-between;align-items:center;padding:6px 14px;border-bottom:1px solid var(--border);font-size:11.5px;transition:background var(--t)}
+.db-row:last-child{border-bottom:none}
+.db-row:hover{background:var(--bg4)}
+.db-col{font-family:var(--fm);color:var(--text2)}
+.db-type{font-family:var(--fm);font-size:10.5px;color:var(--text3)}
+.pk{font-size:9px;padding:1px 5px;background:var(--yellow-dim);color:var(--yellow);border-radius:3px;margin-left:4px;font-weight:600;font-family:var(--fm);border:1px solid rgba(234,179,8,0.2)}
+.fk{font-size:9px;padding:1px 5px;background:var(--blue-dim);color:#93c5fd;border-radius:3px;margin-left:4px;font-weight:600;font-family:var(--fm);border:1px solid rgba(59,130,246,0.2)}
+
+/* API ROUTES */
+.api-group{margin-bottom:28px}
+.api-group-label{font-size:10px;font-family:var(--fm);color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.api-list{display:flex;flex-direction:column;gap:7px}
+.api-row{display:flex;align-items:flex-start;gap:11px;padding:11px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rl);transition:border-color var(--t)}
+.api-row:hover{border-color:var(--border2)}
+.method{font-family:var(--fm);font-size:9px;font-weight:700;padding:3px 7px;border-radius:4px;border:1px solid;white-space:nowrap;min-width:44px;text-align:center;flex-shrink:0;margin-top:1px}
+.GET{background:var(--green-dim);color:#86efac;border-color:rgba(34,197,94,0.25)}
+.POST{background:var(--blue-dim);color:#93c5fd;border-color:rgba(59,130,246,0.25)}
+.PUT{background:var(--yellow-dim);color:#fde047;border-color:rgba(234,179,8,0.25)}
+.PATCH{background:var(--orange-dim);color:#fdba74;border-color:rgba(249,115,22,0.25)}
+.DELETE{background:var(--red-dim);color:#fca5a5;border-color:rgba(239,68,68,0.25)}
+.api-path{font-family:var(--fm);font-size:12px;color:var(--text);margin-bottom:2px}
+.api-desc{font-size:11.5px;color:var(--text3);line-height:1.5}
+
+/* WORKFLOW TIMELINE */
+.workflow{display:flex;flex-direction:column;gap:0}
+.wf-phase{display:flex;gap:18px;position:relative}
+.wf-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.wf-num{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:11px;font-weight:500;flex-shrink:0;border:1px solid;position:relative;z-index:1}
+.wf-line{width:1px;background:var(--border);flex:1;min-height:16px}
+.wf-body{padding-bottom:28px;flex:1;padding-top:5px}
+.wf-title{font-size:14px;font-weight:600;margin-bottom:5px;font-family:var(--fd)}
+.wf-desc{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:10px}
+.wf-tags{display:flex;flex-wrap:wrap;gap:5px}
+
+/* PERMISSION TABLE */
+.perm-wrap{overflow-x:auto;border-radius:var(--rxl);border:1px solid var(--border);margin-bottom:28px}
+.perm-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.perm-table th{padding:10px 14px;text-align:left;font-family:var(--fm);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;background:var(--bg2);border-bottom:1px solid var(--border)}
+.perm-table th:not(:first-child){text-align:center}
+.perm-table td{padding:9px 14px;border-bottom:1px solid var(--border);color:var(--text2)}
+.perm-table tr:last-child td{border-bottom:none}
+.perm-table tr:hover td{background:var(--bg3)}
+.perm-table td:not(:first-child){text-align:center}
+.py{color:var(--green);font-size:15px}.pn{color:var(--text4);font-size:15px}
+
+/* STACK GRID */
+.stack-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-bottom:28px}
+.stack-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rxl);padding:16px 18px;transition:all var(--t)}
+.stack-item:hover{border-color:rgba(59,130,246,0.2);transform:translateY(-1px)}
+.stack-layer{font-family:var(--fm);font-size:9px;color:var(--blue);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:5px}
+.stack-tech{font-family:var(--fd);font-size:14px;font-weight:600;margin-bottom:5px}
+.stack-detail{font-size:11.5px;color:var(--text2);line-height:1.55}
+
+/* ENV TABLE */
+.env-table{width:100%;border-collapse:collapse;font-size:12px;border-radius:var(--rxl);overflow:hidden;border:1px solid var(--border);margin-bottom:24px}
+.env-table th{padding:9px 14px;background:var(--bg2);font-family:var(--fm);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;text-align:left;border-bottom:1px solid var(--border)}
+.env-table td{padding:8px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+.env-table tr:last-child td{border-bottom:none}
+.env-table tr:hover td{background:var(--bg3)}
+.env-key{font-family:var(--fm);font-size:11px;color:var(--teal)}
+.env-desc{font-size:11.5px;color:var(--text2)}
+.env-req{font-size:9px;padding:1px 5px;background:var(--red-dim);color:#fca5a5;border-radius:3px;font-family:var(--fm);margin-left:4px}
+
+/* FEATURE CARDS */
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-bottom:28px}
+.feat-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rxl);padding:18px 20px;transition:all var(--t)}
+.feat-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.feat-cat{font-size:9px;font-family:var(--fm);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:7px;font-weight:500}
+.feat-name{font-size:13.5px;font-weight:600;margin-bottom:7px}
+.feat-desc{font-size:12px;color:var(--text2);line-height:1.65}
+
+/* FOLDER TREE */
+.tree-block{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rxl);overflow:hidden;margin:14px 0 24px}
+.tree-head{display:flex;align-items:center;padding:9px 16px;background:var(--bg3);border-bottom:1px solid var(--border)}
+.tree-dots{display:flex;gap:5px}
+.td{width:10px;height:10px;border-radius:50%}
+.td.r{background:#ff5f57}.td.y{background:#ffbd2e}.td.g{background:#28c840}
+.tree-block pre{padding:18px 20px;font-family:var(--fm);font-size:12px;line-height:1.7;color:var(--text2);overflow-x:auto;white-space:pre}
+.tr-dir{color:#60a5fa}.tr-file{color:#94a878}.tr-cm{color:var(--text3)}
+
+/* COLOR SWATCHES */
+.swatch-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.swatch{display:flex;flex-direction:column;align-items:center;gap:5px}
+.swatch-box{width:48px;height:48px;border-radius:var(--rl);border:1px solid var(--border2)}
+.swatch-label{font-size:9px;font-family:var(--fm);color:var(--text3)}
+
+/* MOBILE HAMBURGER */
+.mob-toggle{display:none;position:fixed;bottom:20px;right:20px;width:46px;height:46px;background:var(--blue);border:none;border-radius:50%;cursor:pointer;z-index:200;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(59,130,246,0.4)}
+.mob-toggle svg{width:20px;height:20px;color:#fff}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99}
+
+@media(max-width:860px){
+  .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:100;transform:translateX(-100%);transition:transform 0.2s ease}
+  .sidebar.open{transform:translateX(0)}
+  .sb-overlay.visible{display:block}
+  .main{margin-left:0}
+  .content-scroll{padding:24px 18px 60px}
+  h1.page-title{font-size:26px}
+  .cards-grid,.db-grid,.feat-grid,.stack-grid,.role-grid{grid-template-columns:1fr}
+  .mob-toggle{display:flex}
+}
+</style>
+</head>
+<body>
+
+<div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
+<button class="mob-toggle" onclick="toggleSidebar()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+</button>
+
+<div class="shell">
+
+<!-- ══════════════════════════════════════
+     SIDEBAR
+══════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-top">
+    <div class="sb-logo">
+      <div class="sb-mark">DF</div>
+      <div>
+        <div class="sb-name">DocForge</div>
+        <div class="sb-ver">v1.0.0 · Full Documentation</div>
+      </div>
+    </div>
+    <div class="sb-badge">Project Docs</div>
+  </div>
+
+  <nav class="sb-body">
+    <div class="sb-group-label">Getting Started</div>
+    <div class="sb-item active" onclick="go('overview',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Overview
+      <div class="sb-dot"></div>
+    </div>
+    <div class="sb-item" onclick="go('workflow',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      User Workflow
+      <div class="sb-dot"></div>
+    </div>
+
+    <div class="sb-group-label">Design</div>
+    <div class="sb-item" onclick="go('design',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/></svg>
+      Design System
+      <div class="sb-dot"></div>
+    </div>
+
+    <div class="sb-group-label">Architecture</div>
+    <div class="sb-item" onclick="go('roles',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Roles & Auth
+      <div class="sb-dot"></div>
+    </div>
+    <div class="sb-item" onclick="go('database',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+      Database Schema
+      <div class="sb-dot"></div>
+    </div>
+    <div class="sb-item" onclick="go('api',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      API Routes
+      <div class="sb-dot"></div>
+    </div>
+
+    <div class="sb-group-label">Development</div>
+    <div class="sb-item" onclick="go('frontend',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      Frontend (Next.js)
+      <div class="sb-dot"></div>
+    </div>
+    <div class="sb-item" onclick="go('backend',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+      Backend (Node.js)
+      <div class="sb-dot"></div>
+    </div>
+    <div class="sb-item" onclick="go('structure',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      Project Structure
+      <div class="sb-dot"></div>
+    </div>
+    <div class="sb-item" onclick="go('gemini',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Gemini Integration
+      <div class="sb-dot"></div>
+    </div>
+
+    <div class="sb-group-label">Operations</div>
+    <div class="sb-item" onclick="go('deployment',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Deployment
+      <div class="sb-dot"></div>
+    </div>
+    <div class="sb-item" onclick="go('features',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      Extra Features
+      <div class="sb-dot"></div>
+    </div>
+  </nav>
+
+  <div class="sb-footer">
+    <div class="sb-footer-text">Next.js · Node.js · PostgreSQL (Neon)<br>Gemini API · Cloudflare R2 · Vercel</div>
+  </div>
+</aside>
+
+<!-- ══════════════════════════════════════
+     MAIN
+══════════════════════════════════════ -->
+<div class="main">
+  <div class="topbar">
+    <div class="tb-breadcrumb">
+      <span>DocForge</span>
+      <span class="tb-sep">/</span>
+      <span class="tb-current" id="breadcrumb">Overview</span>
+    </div>
+    <div class="tb-right">
+      <span class="tb-chip blue">v1.0.0</span>
+      <span class="tb-chip green">Documentation Creator</span>
+    </div>
+  </div>
+
+  <div class="content-scroll">
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE: OVERVIEW
+══════════════════════════════════════════════════════ -->
+<div class="page active" id="page-overview">
+  <div class="page-eyebrow">Project Documentation</div>
+  <h1 class="page-title">DocForge — <span>Documentation Creator</span></h1>
+  <p class="page-lead">A full-stack SaaS web application that helps developers and product teams create complete, professional project documentation. Users describe their project — either manually section by section or through a single AI-powered flow — and receive a beautiful, editable, exportable HTML documentation website.</p>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Platform Type</div><div class="stat-val" style="color:var(--blue)">SaaS Tool</div><div class="stat-sub">Documentation creator</div></div>
+    <div class="stat-card"><div class="stat-label">Input Modes</div><div class="stat-val" style="color:var(--teal)">2 Modes</div><div class="stat-sub">Manual + AI Generate</div></div>
+    <div class="stat-card"><div class="stat-label">Doc Sections</div><div class="stat-val" style="color:var(--purple)">12+</div><div class="stat-sub">Overview to Deployment</div></div>
+    <div class="stat-card"><div class="stat-label">AI Engine</div><div class="stat-val" style="color:var(--orange)">Gemini</div><div class="stat-sub">Google AI API</div></div>
+    <div class="stat-card"><div class="stat-label">Output</div><div class="stat-val" style="color:var(--green)">HTML File</div><div class="stat-sub">Editable website</div></div>
+    <div class="stat-card"><div class="stat-label">Database</div><div class="stat-val" style="color:var(--cyan)">Neon PG</div><div class="stat-sub">Serverless PostgreSQL</div></div>
+  </div>
+
+  <h2>What is DocForge?</h2>
+  <p>DocForge is a web application that solves the problem of missing, incomplete, or inconsistent project documentation. Developers typically skip documentation because it takes too long. DocForge eliminates that friction by offering two paths:</p>
+  <p><strong style="color:var(--text)">Manual Mode</strong> — The user fills in structured forms for each documentation section: Overview, Design System, Frontend, Backend, Database, API Routes, Project Structure, Workflow, Auth, Testing, Deployment, and Extra Features. Every field has helpful labels and hints. Once filled, the AI writes a polished, detailed document for that section.</p>
+  <p><strong style="color:var(--text)">AI Mode</strong> — The user writes one description of their project. The AI generates all sections automatically in one flow — from overview to deployment. The output is streamed live section by section.</p>
+  <p>The final output is a single self-contained HTML file — a styled, interactive, multi-page documentation website the user can view in any browser, edit directly, add new sections later, and share with teammates.</p>
+
+  <div class="info-box"><strong>Core Value Proposition:</strong> Zero-friction documentation. Write once, get a professional full-stack project doc in under 60 seconds — complete with DB schema, API routes, design tokens, deployment guide, and more.</div>
+
+  <h2>Target Users</h2>
+  <div class="cards-grid">
+    <div class="card"><div class="card-label">Primary</div><div class="card-title">Solo Developers</div><div class="card-desc">Building side projects or freelance work who need docs for clients, teammates, or investors without spending hours writing them.</div></div>
+    <div class="card"><div class="card-label">Primary</div><div class="card-title">Small Dev Teams</div><div class="card-desc">Teams starting new projects who need onboarding docs, architectural decisions, and API references documented quickly.</div></div>
+    <div class="card"><div class="card-label">Secondary</div><div class="card-title">Technical Writers</div><div class="card-desc">Writers who need an AI scaffold to start from, then edit and refine manually in the editable output.</div></div>
+    <div class="card"><div class="card-label">Secondary</div><div class="card-title">Bootcamp Students</div><div class="card-desc">Students building portfolio projects who need professional README-quality documentation for GitHub and recruiters.</div></div>
+  </div>
+
+  <h2>Core Problem Solved</h2>
+  <p>Documentation is universally acknowledged as important but universally skipped because:</p>
+  <div class="tags-row">
+    <span class="tag tag-red">Takes too long to write</span>
+    <span class="tag tag-red">No clear structure to follow</span>
+    <span class="tag tag-red">Gets outdated and ignored</span>
+    <span class="tag tag-red">Hard to maintain across team</span>
+    <span class="tag tag-orange">Generic templates feel impersonal</span>
+  </div>
+  <p>DocForge solves all of these by combining structured input (so the user only provides facts, not prose), AI writing (so the language and structure are handled automatically), and editable HTML output (so the doc stays alive and can be updated any time).</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE: USER WORKFLOW
+══════════════════════════════════════════════════════ -->
+<div class="page" id="page-workflow">
+  <div class="page-eyebrow">User Experience</div>
+  <h1 class="page-title">User <span>Workflow</span></h1>
+  <p class="page-lead">How a user goes from landing on DocForge to having a complete, downloadable documentation website. Two distinct paths: Manual (section by section) and AI (one prompt, full doc).</p>
+
+  <div class="info-box">Both modes produce the same final output — an editable, downloadable HTML documentation file. The difference is how the content is created: manually with AI-assisted writing per section, or fully automatically from a single description.</div>
+
+  <h2>Path 1 — Manual Mode</h2>
+  <div class="workflow">
+    <div class="wf-phase">
+      <div class="wf-left"><div class="wf-num" style="background:var(--blue-dim);color:var(--blue);border-color:rgba(59,130,246,0.3)">01</div><div class="wf-line"></div></div>
+      <div class="wf-body">
+        <div class="wf-title">Enter API Key & Select Section</div>
+        <div class="wf-desc">User pastes their Google Gemini API key (free from aistudio.google.com). The key indicator turns green. User selects a documentation section from the left sidebar — e.g. "Overview". The form panel updates with relevant input fields for that section.</div>
+        <div class="wf-tags"><span class="tag tag-gray">API key validated client-side</span><span class="tag tag-gray">Sidebar navigation</span><span class="tag tag-gray">Mode: Manual selected</span></div>
+      </div>
+    </div>
+    <div class="wf-phase">
+      <div class="wf-left"><div class="wf-num" style="background:var(--purple-dim);color:var(--purple);border-color:rgba(168,85,247,0.3)">02</div><div class="wf-line"></div></div>
+      <div class="wf-body">
+        <div class="wf-title">Fill Section Form</div>
+        <div class="wf-desc">User fills in the structured form for the selected section. For Overview: project name, tagline, purpose, users, problem, features, tech stack, version. For Design: color pickers with hex inputs, font selectors, border radius, aesthetic style. For Database: table names and column definitions. Each field has hints and placeholder text guiding the user.</div>
+        <div class="wf-tags"><span class="tag tag-blue">Color pickers + hex sync</span><span class="tag tag-blue">Dynamic step builder</span><span class="tag tag-blue">Checkbox feature selectors</span></div>
+      </div>
+    </div>
+    <div class="wf-phase">
+      <div class="wf-left"><div class="wf-num" style="background:var(--teal-dim);color:var(--teal);border-color:rgba(20,184,166,0.3)">03</div><div class="wf-line"></div></div>
+      <div class="wf-body">
+        <div class="wf-title">AI Generates Section (Streamed)</div>
+        <div class="wf-desc">User clicks the section-specific generate button (e.g. "Write Overview"). The app calls the Gemini API with a structured prompt built from the form data. The response streams in real time — visible in the Stream tab. As the content arrives, it is simultaneously written into the Document tab as an editable content block.</div>
+        <div class="wf-tags"><span class="tag tag-teal">Gemini SSE streaming</span><span class="tag tag-teal">Live stream preview</span><span class="tag tag-teal">Section added to doc</span></div>
+      </div>
+    </div>
+    <div class="wf-phase">
+      <div class="wf-left"><div class="wf-num" style="background:var(--green-dim);color:var(--green);border-color:rgba(34,197,94,0.3)">04</div><div class="wf-line"></div></div>
+      <div class="wf-body">
+        <div class="wf-title">Edit & Refine</div>
+        <div class="wf-desc">Once generation is complete, the section appears in the Document tab as a content-editable block. The user can click anywhere in the block and edit the text directly in the browser — no special editor needed. Sections can be individually deleted using the X button in the section header. The user can generate more sections by navigating the sidebar.</div>
+        <div class="wf-tags"><span class="tag tag-green">contenteditable blocks</span><span class="tag tag-green">Individual section delete</span><span class="tag tag-green">Free text editing</span></div>
+      </div>
+    </div>
+    <div class="wf-phase">
+      <div class="wf-left"><div class="wf-num" style="background:var(--orange-dim);color:var(--orange);border-color:rgba(249,115,22,0.3)">05</div></div>
+      <div class="wf-body">
+        <div class="wf-title">Download / Export</div>
+        <div class="wf-desc">When satisfied, user clicks "Download HTML". The app serializes the entire document area — all sections with their edited content — into a complete self-contained HTML file styled with embedded CSS. The file is downloaded to the user's device. It can be opened in any browser, shared as an attachment, hosted on GitHub Pages, or uploaded to any file sharing service.</div>
+        <div class="wf-tags"><span class="tag tag-orange">Single HTML file output</span><span class="tag tag-orange">Full CSS embedded</span><span class="tag tag-orange">Opens in any browser</span><span class="tag tag-orange">Editable later</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2>Path 2 — AI Full Generate Mode</h2>
+  <div class="workflow">
+    <div class="wf-phase">
+      <div class="wf-left"><div class="wf-num" style="background:var(--blue-dim);color:var(--blue);border-color:rgba(59,130,246,0.3)">01</div><div class="wf-line"></div></div>
+      <div class="wf-body">
+        <div class="wf-title">Enter API Key + Project Description</div>
+        <div class="wf-desc">User enters their Gemini API key and navigates to the "AI Full Generate" section (lightning bolt icon). They write a detailed free-text description of their project — what it does, who uses it, the tech stack, key features. The more detail provided, the richer the generated documentation.</div>
+        <div class="wf-tags"><span class="tag tag-gray">Free text description</span><span class="tag tag-gray">Section checkboxes to include</span><span class="tag tag-gray">Model selector (Haiku/Sonnet)</span></div>
+      </div>
+    </div>
+    <div class="wf-phase">
+      <div class="wf-left"><div class="wf-num" style="background:var(--blue-dim);color:var(--blue);border-color:rgba(59,130,246,0.3)">02</div><div class="wf-line"></div></div>
+      <div class="wf-body">
+        <div class="wf-title">Choose Output Type</div>
+        <div class="wf-desc">Two output options: <strong style="color:var(--text)">Build section by section</strong> (generates each section into the editable document area one by one — same experience as Manual Mode but AI-driven) or <strong style="color:var(--text)">Full standalone HTML</strong> (generates a single complete interactive documentation website in one shot, viewable in the Preview tab).</div>
+        <div class="wf-tags"><span class="tag tag-blue">Section-by-section output</span><span class="tag tag-blue">Full HTML doc output</span></div>
+      </div>
+    </div>
+    <div class="wf-phase">
+      <div class="wf-left"><div class="wf-num" style="background:var(--teal-dim);color:var(--teal);border-color:rgba(20,184,166,0.3)">03</div><div class="wf-line"></div></div>
+      <div class="wf-body">
+        <div class="wf-title">AI Generates All Sections</div>
+        <div class="wf-desc">The system calls Gemini for each selected section sequentially, streaming each one. A progress tracker shows which section is being generated (active/done states). The Stream tab shows live text output. For section-by-section mode, each completed section appears in the Document tab as an editable block. For full HTML mode, the output is rendered in the Preview iframe when complete.</div>
+        <div class="wf-tags"><span class="tag tag-teal">Sequential section generation</span><span class="tag tag-teal">Progress tracker UI</span><span class="tag tag-teal">Live stream view</span></div>
+      </div>
+    </div>
+    <div class="wf-phase">
+      <div class="wf-left"><div class="wf-num" style="background:var(--green-dim);color:var(--green);border-color:rgba(34,197,94,0.3)">04</div></div>
+      <div class="wf-body">
+        <div class="wf-title">Edit & Download</div>
+        <div class="wf-desc">Same as Manual Mode — all generated sections are editable. User refines, removes unwanted sections, and clicks Download HTML to export the final documentation file. The downloaded file is a complete, self-contained, styled documentation website.</div>
+        <div class="wf-tags"><span class="tag tag-green">Edit any section</span><span class="tag tag-green">Remove sections</span><span class="tag tag-green">Download editable HTML</span></div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Documentation Sections Available</h2>
+  <div class="cards-grid">
+    <div class="card"><div class="card-label">Section 1</div><div class="card-title">📋 Project Overview</div><div class="card-desc">Name, tagline, purpose, users, problem, features, version, stage — generates executive summary, problem statement, solution overview.</div></div>
+    <div class="card"><div class="card-label">Section 2</div><div class="card-title">🎨 Design System</div><div class="card-desc">Color palette (with pickers), typography (heading/body/mono fonts), spacing, border radius, theme (dark/light), aesthetic style.</div></div>
+    <div class="card"><div class="card-label">Section 3</div><div class="card-title">💻 Frontend</div><div class="card-desc">Framework (Next.js 14), styling (Tailwind), state management, key pages, packages, PWA/i18n/a11y feature flags.</div></div>
+    <div class="card"><div class="card-label">Section 4</div><div class="card-title">🖥️ Backend</div><div class="card-desc">Language/framework (Node.js+Express or Python+FastAPI), ORM (Drizzle), auth strategy, caching, services, integrations (Twilio, Resend, R2).</div></div>
+    <div class="card"><div class="card-label">Section 5</div><div class="card-title">🗄️ Database Schema</div><div class="card-desc">Engine (Neon PostgreSQL), table list with columns, tenancy model, connection pooling, soft deletes, RLS, audit logs.</div></div>
+    <div class="card"><div class="card-label">Section 6</div><div class="card-title">⚡ API Routes</div><div class="card-desc">API style (REST/tRPC), base path, route groups, RBAC, Zod validation, rate limiting, Swagger, versioning.</div></div>
+    <div class="card"><div class="card-label">Section 7</div><div class="card-title">📁 Project Structure</div><div class="card-desc">Monorepo tool (Turborepo), package manager (pnpm), source directories, key config files, workspace layout.</div></div>
+    <div class="card"><div class="card-label">Section 8</div><div class="card-title">🔄 Workflow</div><div class="card-desc">Workflow name, main entity, dynamic step builder (name + description per step), status states, generates full phase documentation.</div></div>
+    <div class="card"><div class="card-label">Section 9</div><div class="card-title">🔒 Auth & Security</div><div class="card-desc">Auth system, user roles, login methods, security features (bcrypt, token rotation, rate limiting, 2FA, HTTPS).</div></div>
+    <div class="card"><div class="card-label">Section 10</div><div class="card-title">✅ Testing</div><div class="card-desc">Unit testing (Vitest/Jest), integration testing (Supertest), E2E (Playwright/Cypress), key test scenarios to cover.</div></div>
+    <div class="card"><div class="card-label">Section 11</div><div class="card-title">🚀 Deployment</div><div class="card-desc">Frontend host (Vercel), backend host (Railway), DB host (Neon), CI/CD (GitHub Actions), environments, monitoring (Sentry).</div></div>
+    <div class="card"><div class="card-label">Section 12</div><div class="card-title">⭐ Extra Features</div><div class="card-desc">Feature categories (Customer/Ops/Finance/Analytics/Integration/AI/Mobile), specific feature requests, generates 14-16 feature cards.</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE: DESIGN SYSTEM
+══════════════════════════════════════════════════════ -->
+<div class="page" id="page-design">
+  <div class="page-eyebrow">Visual Identity</div>
+  <h1 class="page-title">Design <span>System</span></h1>
+  <p class="page-lead">The visual language of DocForge — color palette, typography, spacing, component patterns, and the design constants used throughout the application.</p>
+
+  <h2>Color Palette</h2>
+  <h3>Primary Brand Colors</h3>
+  <div class="swatch-row">
+    <div class="swatch"><div class="swatch-box" style="background:#3b82f6"></div><div class="swatch-label">Blue 500<br>#3b82f6</div></div>
+    <div class="swatch"><div class="swatch-box" style="background:#2563eb"></div><div class="swatch-label">Blue 600<br>#2563eb</div></div>
+    <div class="swatch"><div class="swatch-box" style="background:#14b8a6"></div><div class="swatch-label">Teal 500<br>#14b8a6</div></div>
+    <div class="swatch"><div class="swatch-box" style="background:#06b6d4"></div><div class="swatch-label">Cyan 500<br>#06b6d4</div></div>
+  </div>
+  <h3>Semantic Colors</h3>
+  <div class="swatch-row">
+    <div class="swatch"><div class="swatch-box" style="background:#22c55e"></div><div class="swatch-label">Success<br>#22c55e</div></div>
+    <div class="swatch"><div class="swatch-box" style="background:#f97316"></div><div class="swatch-label">Warning<br>#f97316</div></div>
+    <div class="swatch"><div class="swatch-box" style="background:#ef4444"></div><div class="swatch-label">Danger<br>#ef4444</div></div>
+    <div class="swatch"><div class="swatch-box" style="background:#a855f7"></div><div class="swatch-label">Purple<br>#a855f7</div></div>
+    <div class="swatch"><div class="swatch-box" style="background:#eab308"></div><div class="swatch-label">Yellow<br>#eab308</div></div>
+    <div class="swatch"><div class="swatch-box" style="background:#ec4899"></div><div class="swatch-label">Pink<br>#ec4899</div></div>
+  </div>
+  <h3>Background Scale</h3>
+  <div class="swatch-row">
+    <div class="swatch"><div class="swatch-box" style="background:#07080a;border:1px solid #333"></div><div class="swatch-label">bg<br>#07080a</div></div>
+    <div class="swatch"><div class="swatch-box" style="background:#0d0f13;border:1px solid #333"></div><div class="swatch-label">bg2<br>#0d0f13</div></div>
+    <div class="swatch"><div class="swatch-box" style="background:#13161c;border:1px solid #333"></div><div class="swatch-label">bg3<br>#13161c</div></div>
+    <div class="swatch"><div class="swatch-box" style="background:#1e2230;border:1px solid #333"></div><div class="swatch-label">surface<br>#1e2230</div></div>
+  </div>
+  <h3>Text Scale</h3>
+  <div class="swatch-row">
+    <div class="swatch"><div class="swatch-box" style="background:#eceef2"></div><div class="swatch-label">text<br>#eceef2</div></div>
+    <div class="swatch"><div class="swatch-box" style="background:#8c91a0"></div><div class="swatch-label">text2<br>#8c91a0</div></div>
+    <div class="swatch"><div class="swatch-box" style="background:#4f5362"></div><div class="swatch-label">text3<br>#4f5362</div></div>
+    <div class="swatch"><div class="swatch-box" style="background:#32353f"></div><div class="swatch-label">text4<br>#32353f</div></div>
+  </div>
+
+  <h2>CSS Design Tokens</h2>
+  <div class="code-block">
+    <div class="cb-head"><div class="cb-dots"><div class="cbd r"></div><div class="cbd y"></div><div class="cbd g"></div></div><div class="cb-lang">CSS Variables</div></div>
+    <pre>
+:root {
+  /* Backgrounds */
+  --bg:       #07080a;   /* page background */
+  --bg2:      #0d0f13;   /* sidebar / panel bg */
+  --bg3:      #13161c;   /* cards / inputs */
+  --bg4:      #191d25;   /* focused input bg */
+  --surface:  #1e2230;   /* elevated surface */
+  --surface2: #252a38;   /* hover surface */
+
+  /* Borders */
+  --border:   rgba(255,255,255,0.06);  /* default border */
+  --border2:  rgba(255,255,255,0.11);  /* hover border */
+  --border3:  rgba(255,255,255,0.18);  /* active border */
+
+  /* Text */
+  --text:     #eceef2;   /* primary text */
+  --text2:    #8c91a0;   /* secondary text */
+  --text3:    #4f5362;   /* muted text */
+  --text4:    #32353f;   /* disabled text */
+
+  /* Brand */
+  --blue:     #3b82f6;
+  --blue2:    #2563eb;
+  --blue-dim: rgba(59,130,246,0.12);
+  --teal:     #14b8a6;
+  --teal-dim: rgba(20,184,166,0.12);
+
+  /* Semantic */
+  --green:    #22c55e;
+  --orange:   #f97316;
+  --red:      #ef4444;
+  --purple:   #a855f7;
+  --yellow:   #eab308;
+  --cyan:     #06b6d4;
+
+  /* Typography */
+  --fd: 'Syne', sans-serif;          /* headings */
+  --fb: 'Instrument Sans', sans-serif; /* body */
+  --fm: 'JetBrains Mono', monospace; /* code */
+
+  /* Spacing */
+  --r:   6px;    /* base radius */
+  --rl:  10px;   /* large radius */
+  --rxl: 16px;   /* extra large radius */
+
+  /* Animation */
+  --t: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}</pre>
+  </div>
+
+  <h2>Typography</h2>
+  <div class="stack-grid">
+    <div class="stack-item"><div class="stack-layer">Display / Heading</div><div class="stack-tech">Syne</div><div class="stack-detail">800 weight. Used for all page titles, section headings, card titles, and the brand mark. Loaded from Google Fonts. Letter-spacing: -0.02em to -0.04em for impact.</div></div>
+    <div class="stack-item"><div class="stack-layer">Body / UI</div><div class="stack-tech">Instrument Sans</div><div class="stack-detail">400/500/600 weights. Used for all body copy, UI labels, descriptions, form fields, and general interface text. Clean and legible at small sizes.</div></div>
+    <div class="stack-item"><div class="stack-layer">Code / Monospace</div><div class="stack-tech">JetBrains Mono</div><div class="stack-detail">300/400/500 weights. Used for API keys, code snippets, file paths, model names, timestamps, and all monospaced data. Excellent readability.</div></div>
+  </div>
+
+  <h2>Component Patterns</h2>
+  <h3>Buttons</h3>
+  <p>All primary action buttons use <code>font-family: var(--fd)</code> (Syne) at 700 weight, giving them a distinct display-font appearance that stands out from body text. Buttons have a <code>::before</code> pseudo-element linear-gradient overlay for a subtle sheen. All buttons transform up 1px on hover and show a colored box-shadow glow matching their hue.</p>
+
+  <h3>Form Fields</h3>
+  <p>All inputs share the same base: <code>background: var(--bg3)</code>, <code>border: 1px solid var(--border)</code>. On focus, border transitions to <code>rgba(59,130,246,0.4)</code> and background deepens to <code>var(--bg4)</code>. This creates a clear focus state without heavy outlines.</p>
+
+  <h3>Section Cards in Doc Output</h3>
+  <p>Each generated doc section uses a consistent three-part layout: a header row (icon + title + badge + delete button), followed by a <code>contenteditable</code> block with a streaming cursor animation while content is being generated. The block transitions to full editability once generation completes.</p>
+
+  <h3>Sidebar Navigation</h3>
+  <p>Active sidebar items receive <code>background: var(--blue-dim)</code>, colored text, and a 3px left border accent line absolutely positioned at <code>left: -10px</code> relative to the item. Tooltip labels use <code>::after</code> pseudo-elements that appear on hover.</p>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE: ROLES & AUTH
+══════════════════════════════════════════════════════ -->
+<div class="page" id="page-roles">
+  <div class="page-eyebrow">Access Control</div>
+  <h1 class="page-title">Roles & <span>Auth</span></h1>
+  <p class="page-lead">DocForge uses a simple but extensible authentication system. The initial version supports individual user accounts. Each user manages their own documentation projects. Future versions will add team collaboration.</p>
+
+  <h2>User Roles</h2>
+  <div class="role-grid">
+    <div class="role-card">
+      <div class="role-avatar" style="background:var(--red-dim);color:var(--red)">SA</div>
+      <div class="role-name">Superadmin</div>
+      <div class="role-desc">Full platform access. Manages all user accounts, monitors API usage across all users, views platform analytics, manages subscription plans. Can impersonate any user for support.</div>
+    </div>
+    <div class="role-card">
+      <div class="role-avatar" style="background:var(--blue-dim);color:var(--blue)">US</div>
+      <div class="role-name">User (Free)</div>
+      <div class="role-desc">Can create documentation projects, use Manual and AI modes, generate up to 10 docs per month, download HTML output. Must provide own Gemini API key. Cannot save docs to cloud (localStorage only).</div>
+    </div>
+    <div class="role-card">
+      <div class="role-avatar" style="background:var(--teal-dim);color:var(--teal)">PR</div>
+      <div class="role-name">User (Pro)</div>
+      <div class="role-desc">Unlimited documentation generation. Cloud save and sync across devices. Doc version history. Custom templates. Priority support. Collaborative sharing links. Hosted doc pages.</div>
+    </div>
+  </div>
+
+  <div class="warn-box"><strong>v1.0 Note:</strong> The initial release operates without user accounts — the API key is provided by the user and stored only in their browser session. No server-side auth or data persistence is required for v1. User account system is planned for v2.</div>
+
+  <h2>Authentication Flow (v2+)</h2>
+  <div class="code-block">
+    <div class="cb-head"><div class="cb-dots"><div class="cbd r"></div><div class="cbd y"></div><div class="cbd g"></div></div><div class="cb-lang">TypeScript — auth middleware</div></div>
+    <pre>
+// middleware/auth.ts (Next.js App Router)
+import { NextRequest, NextResponse } from 'next/server';
+import { verifyJWT } from '@/lib/jwt';
+
+export async function middleware(req: NextRequest) {
+  const token = req.cookies.get('auth_token')?.value;
+
+  if (!token) {
+    return NextResponse.redirect(new URL('/login', req.url));
+  }
+
+  try {
+    const payload = await verifyJWT(token);
+    const requestHeaders = new Headers(req.headers);
+    requestHeaders.set('x-user-id', payload.userId);
+    requestHeaders.set('x-user-role', payload.role);
+
+    return NextResponse.next({ request: { headers: requestHeaders } });
+  } catch {
+    return NextResponse.redirect(new URL('/login', req.url));
+  }
+}
+
+export const config = {
+  matcher: ['/dashboard/:path*', '/api/docs/:path*'],
+};</pre>
+  </div>
+
+  <h2>Permission Matrix (v2+)</h2>
+  <div class="perm-wrap">
+    <table class="perm-table">
+      <thead><tr><th>Action</th><th>Superadmin</th><th>Pro User</th><th>Free User</th></tr></thead>
+      <tbody>
+        <tr><td>Create documentation project</td><td><span class="py">✓</span></td><td><span class="py">✓</span></td><td><span class="py">✓</span></td></tr>
+        <tr><td>Manual section generation</td><td><span class="py">✓</span></td><td><span class="py">✓</span></td><td><span class="py">✓</span></td></tr>
+        <tr><td>AI full generate (own key)</td><td><span class="py">✓</span></td><td><span class="py">✓</span></td><td><span class="py">✓</span></td></tr>
+        <tr><td>Download HTML output</td><td><span class="py">✓</span></td><td><span class="py">✓</span></td><td><span class="py">✓</span></td></tr>
+        <tr><td>Cloud save / sync</td><td><span class="py">✓</span></td><td><span class="py">✓</span></td><td><span class="pn">✗</span></td></tr>
+        <tr><td>Version history</td><td><span class="py">✓</span></td><td><span class="py">✓</span></td><td><span class="pn">✗</span></td></tr>
+        <tr><td>Unlimited generations</td><td><span class="py">✓</span></td><td><span class="py">✓</span></td><td><span class="pn">✗</span></td></tr>
+        <tr><td>Custom templates</td><td><span class="py">✓</span></td><td><span class="py">✓</span></td><td><span class="pn">✗</span></td></tr>
+        <tr><td>Share/publish docs</td><td><span class="py">✓</span></td><td><span class="py">✓</span></td><td><span class="pn">✗</span></td></tr>
+        <tr><td>Platform analytics</td><td><span class="py">✓</span></td><td><span class="pn">✗</span></td><td><span class="pn">✗</span></td></tr>
+        <tr><td>Manage all users</td><td><span class="py">✓</span></td><td><span class="pn">✗</span></td><td><span class="pn">✗</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE: DATABASE SCHEMA
+══════════════════════════════════════════════════════ -->
+<div class="page" id="page-database">
+  <div class="page-eyebrow">Neon PostgreSQL</div>
+  <h1 class="page-title">Database <span>Schema</span></h1>
+  <p class="page-lead">PostgreSQL hosted on Neon (serverless). UUID primary keys, timestamptz timestamps, soft deletes via deleted_at. v1 runs without a database (client-side only). v2 adds full cloud persistence.</p>
+
+  <div class="info-box"><strong>v1 Architecture:</strong> No database required. All state lives in the browser. The Gemini API key is stored in a session variable, generated content in JS state, and downloaded docs in the user's file system. v2 introduces cloud persistence for saved projects and user accounts.</div>
+
+  <h2>Core Tables (v2)</h2>
+  <div class="db-grid">
+
+    <div class="db-card">
+      <div class="db-head" style="background:var(--blue-dim);color:#93c5fd;border-bottom-color:rgba(59,130,246,0.15)">users</div>
+      <div class="db-row"><span class="db-col">id<span class="pk">PK</span></span><span class="db-type">uuid</span></div>
+      <div class="db-row"><span class="db-col">email</span><span class="db-type">varchar(255) unique</span></div>
+      <div class="db-row"><span class="db-col">name</span><span class="db-type">varchar(255)</span></div>
+      <div class="db-row"><span class="db-col">password_hash</span><span class="db-type">text</span></div>
+      <div class="db-row"><span class="db-col">plan</span><span class="db-type">enum: free|pro</span></div>
+      <div class="db-row"><span class="db-col">gemini_key_hash</span><span class="db-type">text nullable</span></div>
+      <div class="db-row"><span class="db-col">created_at</span><span class="db-type">timestamptz</span></div>
+      <div class="db-row"><span class="db-col">last_login</span><span class="db-type">timestamptz</span></div>
+    </div>
+
+    <div class="db-card">
+      <div class="db-head" style="background:var(--teal-dim);color:#5eead4;border-bottom-color:rgba(20,184,166,0.15)">projects</div>
+      <div class="db-row"><span class="db-col">id<span class="pk">PK</span></span><span class="db-type">uuid</span></div>
+      <div class="db-row"><span class="db-col">user_id<span class="fk">FK</span></span><span class="db-type">uuid → users</span></div>
+      <div class="db-row"><span class="db-col">name</span><span class="db-type">varchar(255)</span></div>
+      <div class="db-row"><span class="db-col">description</span><span class="db-type">text</span></div>
+      <div class="db-row"><span class="db-col">project_type</span><span class="db-type">varchar(50)</span></div>
+      <div class="db-row"><span class="db-col">last_edited</span><span class="db-type">timestamptz</span></div>
+      <div class="db-row"><span class="db-col">created_at</span><span class="db-type">timestamptz</span></div>
+      <div class="db-row"><span class="db-col">deleted_at</span><span class="db-type">timestamptz nullable</span></div>
+    </div>
+
+    <div class="db-card">
+      <div class="db-head" style="background:var(--purple-dim);color:#d8b4fe;border-bottom-color:rgba(168,85,247,0.15)">doc_sections</div>
+      <div class="db-row"><span class="db-col">id<span class="pk">PK</span></span><span class="db-type">uuid</span></div>
+      <div class="db-row"><span class="db-col">project_id<span class="fk">FK</span></span><span class="db-type">uuid → projects</span></div>
+      <div class="db-row"><span class="db-col">section_type</span><span class="db-type">varchar(50)</span></div>
+      <div class="db-row"><span class="db-col">title</span><span class="db-type">varchar(255)</span></div>
+      <div class="db-row"><span class="db-col">content</span><span class="db-type">text</span></div>
+      <div class="db-row"><span class="db-col">sort_order</span><span class="db-type">int</span></div>
+      <div class="db-row"><span class="db-col">generated_by</span><span class="db-type">enum: manual|ai</span></div>
+      <div class="db-row"><span class="db-col">model_used</span><span class="db-type">varchar(100)</span></div>
+      <div class="db-row"><span class="db-col">created_at</span><span class="db-type">timestamptz</span></div>
+    </div>
+
+    <div class="db-card">
+      <div class="db-head" style="background:var(--green-dim);color:#86efac;border-bottom-color:rgba(34,197,94,0.15)">generation_log</div>
+      <div class="db-row"><span class="db-col">id<span class="pk">PK</span></span><span class="db-type">uuid</span></div>
+      <div class="db-row"><span class="db-col">user_id<span class="fk">FK</span></span><span class="db-type">uuid → users</span></div>
+      <div class="db-row"><span class="db-col">project_id<span class="fk">FK</span></span><span class="db-type">uuid nullable</span></div>
+      <div class="db-row"><span class="db-col">section_type</span><span class="db-type">varchar(50)</span></div>
+      <div class="db-row"><span class="db-col">model</span><span class="db-type">varchar(100)</span></div>
+      <div class="db-row"><span class="db-col">input_tokens</span><span class="db-type">int</span></div>
+      <div class="db-row"><span class="db-col">output_chars</span><span class="db-type">int</span></div>
+      <div class="db-row"><span class="db-col">duration_ms</span><span class="db-type">int</span></div>
+      <div class="db-row"><span class="db-col">status</span><span class="db-type">enum: success|error</span></div>
+      <div class="db-row"><span class="db-col">created_at</span><span class="db-type">timestamptz</span></div>
+    </div>
+
+    <div class="db-card">
+      <div class="db-head">doc_exports</div>
+      <div class="db-row"><span class="db-col">id<span class="pk">PK</span></span><span class="db-type">uuid</span></div>
+      <div class="db-row"><span class="db-col">project_id<span class="fk">FK</span></span><span class="db-type">uuid → projects</span></div>
+      <div class="db-row"><span class="db-col">user_id<span class="fk">FK</span></span><span class="db-type">uuid → users</span></div>
+      <div class="db-row"><span class="db-col">cf_object_key</span><span class="db-type">text</span></div>
+      <div class="db-row"><span class="db-col">file_size_bytes</span><span class="db-type">int</span></div>
+      <div class="db-row"><span class="db-col">section_count</span><span class="db-type">int</span></div>
+      <div class="db-row"><span class="db-col">created_at</span><span class="db-type">timestamptz</span></div>
+    </div>
+
+    <div class="db-card">
+      <div class="db-head">subscriptions</div>
+      <div class="db-row"><span class="db-col">id<span class="pk">PK</span></span><span class="db-type">uuid</span></div>
+      <div class="db-row"><span class="db-col">user_id<span class="fk">FK</span></span><span class="db-type">uuid → users</span></div>
+      <div class="db-row"><span class="db-col">plan</span><span class="db-type">enum: free|pro</span></div>
+      <div class="db-row"><span class="db-col">stripe_sub_id</span><span class="db-type">text nullable</span></div>
+      <div class="db-row"><span class="db-col">status</span><span class="db-type">enum: active|cancelled</span></div>
+      <div class="db-row"><span class="db-col">current_period_end</span><span class="db-type">timestamptz</span></div>
+      <div class="db-row"><span class="db-col">created_at</span><span class="db-type">timestamptz</span></div>
+    </div>
+
+  </div>
+
+  <h2>Drizzle Schema Example</h2>
+  <div class="code-block">
+    <div class="cb-head"><div class="cb-dots"><div class="cbd r"></div><div class="cbd y"></div><div class="cbd g"></div></div><div class="cb-lang">TypeScript — Drizzle ORM</div></div>
+    <pre>
+// packages/db/schema/projects.ts
+import { pgTable, uuid, varchar, text, timestamp, pgEnum } from 'drizzle-orm/pg-core';
+
+export const projectTypeEnum = pgEnum('project_type', ['saas','webapp','mobile','api','ecommerce']);
+
+export const projects = pgTable('projects', {
+  id:          uuid('id').defaultRandom().primaryKey(),
+  userId:      uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  name:        varchar('name', { length: 255 }).notNull(),
+  description: text('description'),
+  projectType: projectTypeEnum('project_type').default('webapp'),
+  lastEdited:  timestamp('last_edited', { withTimezone: true }).defaultNow(),
+  createdAt:   timestamp('created_at', { withTimezone: true }).defaultNow(),
+  deletedAt:   timestamp('deleted_at', { withTimezone: true }),
+});
+
+export const docSections = pgTable('doc_sections', {
+  id:          uuid('id').defaultRandom().primaryKey(),
+  projectId:   uuid('project_id').notNull().references(() => projects.id, { onDelete: 'cascade' }),
+  sectionType: varchar('section_type', { length: 50 }).notNull(),
+  title:       varchar('title', { length: 255 }).notNull(),
+  content:     text('content').notNull(),
+  sortOrder:   int('sort_order').default(0),
+  generatedBy: varchar('generated_by', { length: 10 }).default('ai'),
+  modelUsed:   varchar('model_used', { length: 100 }),
+  createdAt:   timestamp('created_at', { withTimezone: true }).defaultNow(),
+});</pre>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE: API ROUTES
+══════════════════════════════════════════════════════ -->
+<div class="page" id="page-api">
+  <div class="page-eyebrow">REST API</div>
+  <h1 class="page-title">API <span>Routes</span></h1>
+  <p class="page-lead">RESTful API on Express (Node.js). Base: <code>/api/v1</code>. v1 is client-side only — no backend API needed. v2 introduces a full backend for cloud save, auth, and billing.</p>
+
+  <div class="api-group">
+    <div class="api-group-label">Authentication (v2)</div>
+    <div class="api-list">
+      <div class="api-row"><span class="method POST">POST</span><div><div class="api-path">/api/v1/auth/register</div><div class="api-desc">Create new user account. Body: { email, password, name }. Returns JWT + refresh token.</div></div></div>
+      <div class="api-row"><span class="method POST">POST</span><div><div class="api-path">/api/v1/auth/login</div><div class="api-desc">Login with email + password. Returns access token (15min) + refresh token (7d).</div></div></div>
+      <div class="api-row"><span class="method POST">POST</span><div><div class="api-path">/api/v1/auth/refresh</div><div class="api-desc">Exchange refresh token for new access token. Rotates refresh token on each use.</div></div></div>
+      <div class="api-row"><span class="method POST">POST</span><div><div class="api-path">/api/v1/auth/logout</div><div class="api-desc">Invalidate refresh token. Clears auth cookie.</div></div></div>
+    </div>
+  </div>
+
+  <div class="api-group">
+    <div class="api-group-label">Projects (v2)</div>
+    <div class="api-list">
+      <div class="api-row"><span class="method GET">GET</span><div><div class="api-path">/api/v1/projects</div><div class="api-desc">List all projects for the authenticated user. Returns array with name, type, lastEdited, sectionCount.</div></div></div>
+      <div class="api-row"><span class="method POST">POST</span><div><div class="api-path">/api/v1/projects</div><div class="api-desc">Create new project. Body: { name, description, projectType }. Returns project record.</div></div></div>
+      <div class="api-row"><span class="method GET">GET</span><div><div class="api-path">/api/v1/projects/:id</div><div class="api-desc">Get full project with all sections. Includes section content, sort order, generation metadata.</div></div></div>
+      <div class="api-row"><span class="method PUT">PUT</span><div><div class="api-path">/api/v1/projects/:id</div><div class="api-desc">Update project metadata (name, description). Does not affect sections.</div></div></div>
+      <div class="api-row"><span class="method DELETE">DELETE</span><div><div class="api-path">/api/v1/projects/:id</div><div class="api-desc">Soft delete project (sets deleted_at). All sections remain in DB for potential recovery.</div></div></div>
+    </div>
+  </div>
+
+  <div class="api-group">
+    <div class="api-group-label">Doc Sections (v2)</div>
+    <div class="api-list">
+      <div class="api-row"><span class="method POST">POST</span><div><div class="api-path">/api/v1/projects/:id/sections</div><div class="api-desc">Save a new generated section. Body: { sectionType, title, content, generatedBy, modelUsed }.</div></div></div>
+      <div class="api-row"><span class="method PUT">PUT</span><div><div class="api-path">/api/v1/sections/:id</div><div class="api-desc">Update section content (after user edits). Body: { content }. Updates lastEdited on parent project.</div></div></div>
+      <div class="api-row"><span class="method DELETE">DELETE</span><div><div class="api-path">/api/v1/sections/:id</div><div class="api-desc">Hard delete a section. Section is permanently removed from the project.</div></div></div>
+      <div class="api-row"><span class="method PUT">PUT</span><div><div class="api-path">/api/v1/projects/:id/sections/reorder</div><div class="api-desc">Reorder sections. Body: { order: [sectionId1, sectionId2, ...] }. Updates sort_order values.</div></div></div>
+    </div>
+  </div>
+
+  <div class="api-group">
+    <div class="api-group-label">Export (v2)</div>
+    <div class="api-list">
+      <div class="api-row"><span class="method POST">POST</span><div><div class="api-path">/api/v1/projects/:id/export</div><div class="api-desc">Generate + upload HTML export to Cloudflare R2. Returns { downloadUrl, objectKey, expiresAt }.</div></div></div>
+      <div class="api-row"><span class="method GET">GET</span><div><div class="api-path">/api/v1/projects/:id/exports</div><div class="api-desc">List all past exports for a project with download URLs and timestamps.</div></div></div>
+    </div>
+  </div>
+
+  <div class="api-group">
+    <div class="api-group-label">Superadmin (v2)</div>
+    <div class="api-list">
+      <div class="api-row"><span class="method GET">GET</span><div><div class="api-path">/api/v1/admin/users</div><div class="api-desc">List all users with plan, generation count, last active, project count.</div></div></div>
+      <div class="api-row"><span class="method GET">GET</span><div><div class="api-path">/api/v1/admin/analytics</div><div class="api-desc">Platform analytics: total docs generated, most used models, popular sections, DAU/MAU.</div></div></div>
+      <div class="api-row"><span class="method PUT">PUT</span><div><div class="api-path">/api/v1/admin/users/:id/plan</div><div class="api-desc">Override user plan (for support/testing). Body: { plan: 'free'|'pro' }.</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE: FRONTEND
+══════════════════════════════════════════════════════ -->
+<div class="page" id="page-frontend">
+  <div class="page-eyebrow">Next.js 14</div>
+  <h1 class="page-title">Frontend <span>Architecture</span></h1>
+  <p class="page-lead">Built with Next.js 14 App Router. The v1 is a single-page application — the entire tool runs client-side, calling the Gemini API directly from the browser using a user-provided API key. No backend required for v1.</p>
+
+  <h2>Tech Stack</h2>
+  <div class="stack-grid">
+    <div class="stack-item"><div class="stack-layer">Framework</div><div class="stack-tech">Next.js 14</div><div class="stack-detail">App Router with RSC. SSR for landing/marketing pages. Client components for the doc editor. TypeScript throughout.</div></div>
+    <div class="stack-item"><div class="stack-layer">Styling</div><div class="stack-tech">Tailwind CSS + Custom</div><div class="stack-detail">Tailwind for utility classes. Custom CSS variables for the design system. No UI component library — all components hand-crafted for the specific aesthetic.</div></div>
+    <div class="stack-item"><div class="stack-layer">State</div><div class="stack-tech">Zustand + React State</div><div class="stack-detail">Zustand for global app state (current section, generated content, API key). React useState/useReducer for component-local UI state.</div></div>
+    <div class="stack-item"><div class="stack-layer">Forms</div><div class="stack-tech">React Hook Form + Zod</div><div class="stack-detail">React Hook Form for all section input forms with controlled fields. Zod schemas for client-side validation of all user inputs before API calls.</div></div>
+    <div class="stack-item"><div class="stack-layer">AI Streaming</div><div class="stack-tech">Fetch + ReadableStream</div><div class="stack-detail">Native browser Fetch API with ReadableStream and TextDecoder. No third-party streaming library needed. SSE parsing handled manually for Gemini's response format.</div></div>
+    <div class="stack-item"><div class="stack-layer">Fonts</div><div class="stack-tech">Google Fonts (next/font)</div><div class="stack-detail">Syne (display), Instrument Sans (body), JetBrains Mono (code). Loaded via next/font/google for optimal performance with self-hosting and zero CLS.</div></div>
+  </div>
+
+  <h2>Application Pages</h2>
+  <div class="cards-grid">
+    <div class="card"><div class="card-label">Route: /</div><div class="card-title">Landing Page</div><div class="card-desc">Marketing page explaining DocForge. Hero with demo GIF, feature highlights, pricing (free vs pro), CTA to open the tool. SSR.</div></div>
+    <div class="card"><div class="card-label">Route: /app</div><div class="card-title">Documentation Creator</div><div class="card-desc">The main editor. Three-column layout: icon nav, form panel, output panel. Fully client-side. This is the core product.</div></div>
+    <div class="card"><div class="card-label">Route: /app/[projectId]</div><div class="card-title">Saved Project (v2)</div><div class="card-desc">Load and continue editing a cloud-saved project. Pre-populates all sections from the DB. Autosaves on content change.</div></div>
+    <div class="card"><div class="card-label">Route: /docs/[shareId]</div><div class="card-title">Shared Doc Page (v2)</div><div class="card-desc">Public read-only view of a shared documentation project. Pro feature. Hosted at a unique URL.</div></div>
+    <div class="card"><div class="card-label">Route: /login</div><div class="card-title">Login / Register (v2)</div><div class="card-desc">Email + password auth. Google OAuth optional. Redirects to /app on success. JWT stored in httpOnly cookie.</div></div>
+    <div class="card"><div class="card-label">Route: /dashboard</div><div class="card-title">Projects Dashboard (v2)</div><div class="card-desc">List of all the user's saved documentation projects with last-edited time, section count, and export history.</div></div>
+  </div>
+
+  <h2>Key Component Architecture</h2>
+  <div class="code-block">
+    <div class="cb-head"><div class="cb-dots"><div class="cbd r"></div><div class="cbd y"></div><div class="cbd g"></div></div><div class="cb-lang">Component tree — /app page</div></div>
+    <pre>
+&lt;DocForgeApp&gt;
+  ├── &lt;IconNav&gt;                    # Left icon sidebar (14 section buttons)
+  ├── &lt;SectionPanel&gt;               # Middle form panel
+  │   ├── &lt;ApiKeyBar&gt;              # Key input with visibility toggle + status dot
+  │   ├── &lt;ModeToggle&gt;             # Manual / AI mode switcher
+  │   ├── &lt;PanelHeader&gt;            # Section name + description (updates on nav)
+  │   ├── &lt;PanelBody&gt;              # Scrollable form area
+  │   │   ├── &lt;OverviewPanel&gt;      # Section: Overview
+  │   │   ├── &lt;DesignPanel&gt;        # Section: Design System (color pickers)
+  │   │   ├── &lt;FrontendPanel&gt;      # Section: Frontend
+  │   │   ├── &lt;BackendPanel&gt;       # Section: Backend
+  │   │   ├── &lt;DatabasePanel&gt;      # Section: Database
+  │   │   ├── &lt;ApiPanel&gt;           # Section: API Routes
+  │   │   ├── &lt;StructurePanel&gt;     # Section: Project Structure
+  │   │   ├── &lt;WorkflowPanel&gt;      # Section: Workflow (dynamic step builder)
+  │   │   ├── &lt;AuthPanel&gt;          # Section: Auth & Security
+  │   │   ├── &lt;TestingPanel&gt;       # Section: Testing
+  │   │   ├── &lt;DeploymentPanel&gt;    # Section: Deployment
+  │   │   ├── &lt;FeaturesPanel&gt;      # Section: Extra Features
+  │   │   └── &lt;AiGeneratePanel&gt;    # Section: AI Full Generate
+  │   └── &lt;StatusStrip&gt;            # Generation status indicator
+  └── &lt;OutputPanel&gt;                # Right output panel
+      ├── &lt;OutputTopbar&gt;           # Tabs + Copy/Clear/Download buttons
+      └── &lt;OutputContent&gt;
+          ├── &lt;DocumentView&gt;       # Editable doc sections (contenteditable)
+          ├── &lt;StreamView&gt;         # Live AI output stream
+          ├── &lt;PreviewView&gt;        # iframe for full HTML preview
+          └── &lt;ProgressView&gt;       # AI generate all progress tracker</pre>
+  </div>
+
+  <h2>Gemini Streaming Implementation</h2>
+  <div class="code-block">
+    <div class="cb-head"><div class="cb-dots"><div class="cbd r"></div><div class="cbd y"></div><div class="cbd g"></div></div><div class="cb-lang">TypeScript — streamGemini()</div></div>
+    <pre>
+async function streamGemini(
+  model: string,
+  prompt: string,
+  onChunk: (chunk: string, full: string) => void
+): Promise&lt;string&gt; {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}` +
+              `:streamGenerateContent?key=${getApiKey()}&alt=sse`;
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: { maxOutputTokens: 8192, temperature: 0.75, topP: 0.95 }
+    })
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err?.error?.message || `HTTP ${response.status}`);
+  }
+
+  const reader = response.body!.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let fullText = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop() ?? '';
+
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue;
+      const data = line.slice(6).trim();
+      if (!data || data === '[DONE]') continue;
+      try {
+        const chunk = JSON.parse(data)
+          ?.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+        if (chunk) {
+          fullText += chunk;
+          onChunk(chunk, fullText);
+        }
+      } catch { /* skip malformed SSE frames */ }
+    }
+  }
+  return fullText;
+}</pre>
+  </div>
+
+  <h2>Download HTML Implementation</h2>
+  <div class="code-block">
+    <div class="cb-head"><div class="cb-dots"><div class="cbd r"></div><div class="cbd y"></div><div class="cbd g"></div></div><div class="cb-lang">TypeScript — downloadDoc()</div></div>
+    <pre>
+function downloadDoc(): void {
+  const sections = Array.from(
+    document.querySelectorAll('.doc-section')
+  ) as HTMLElement[];
+
+  if (sections.length === 0) return;
+
+  const sectionsHTML = sections.map(sec => {
+    const block = sec.querySelector('[contenteditable]') as HTMLElement;
+    return `&lt;div class="doc-section"&gt;
+      ${sec.querySelector('.doc-sec-head')!.innerHTML}
+      &lt;div class="doc-block"&gt;${escapeHtml(block.innerText)}&lt;/div&gt;
+    &lt;/div&gt;`;
+  }).join('\n');
+
+  const html = `&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;title&gt;Project Documentation — DocForge&lt;/title&gt;
+  &lt;link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&amp;
+    family=Instrument+Sans:wght@400;500&amp;family=JetBrains+Mono:wght@400&amp;
+    display=swap" rel="stylesheet"&gt;
+  &lt;style&gt;${EXPORTED_CSS}&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div class="doc-container"&gt;
+    ${sectionsHTML}
+  &lt;/div&gt;
+  &lt;script&gt;${SIDEBAR_NAVIGATION_JS}&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;`;
+
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `documentation-${Date.now()}.html`;
+  a.click();
+  URL.revokeObjectURL(url);
+}</pre>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE: BACKEND
+══════════════════════════════════════════════════════ -->
+<div class="page" id="page-backend">
+  <div class="page-eyebrow">Node.js + Express</div>
+  <h1 class="page-title">Backend <span>Architecture</span></h1>
+  <p class="page-lead">The v1 backend is minimal — Next.js API routes handle auth and serving. The full backend (v2) is a separate Node.js + Express server with dedicated services for projects, exports, billing, and analytics.</p>
+
+  <div class="info-box"><strong>v1 Backend:</strong> No dedicated backend server. Next.js API routes at <code>/api/*</code> handle any server-side logic needed. The Gemini API is called directly from the browser client. No server stores or processes AI responses.</div>
+
+  <h2>v2 Backend Services</h2>
+  <div class="stack-grid">
+    <div class="stack-item"><div class="stack-layer">Runtime</div><div class="stack-tech">Node.js 20 LTS</div><div class="stack-detail">TypeScript. ES modules. tsx for development, compiled to JS for production.</div></div>
+    <div class="stack-item"><div class="stack-layer">Framework</div><div class="stack-tech">Express 5</div><div class="stack-detail">Async/await middleware support. express-validator for request validation. Helmet for security headers.</div></div>
+    <div class="stack-item"><div class="stack-layer">ORM</div><div class="stack-tech">Drizzle ORM</div><div class="stack-detail">Type-safe SQL queries. Schema-first with migrations. Works perfectly with Neon's serverless driver (@neondatabase/serverless).</div></div>
+    <div class="stack-item"><div class="stack-layer">Auth</div><div class="stack-tech">JWT (jose library)</div><div class="stack-detail">jose for RS256 JWT signing/verification. Short-lived access tokens (15min), long-lived refresh tokens (7d) with rotation.</div></div>
+    <div class="stack-item"><div class="stack-layer">File Storage</div><div class="stack-tech">Cloudflare R2</div><div class="stack-detail">Exported HTML docs stored in R2. AWS S3 SDK for presigned URLs. Public bucket for shared doc pages.</div></div>
+    <div class="stack-item"><div class="stack-layer">Email</div><div class="stack-tech">Resend</div><div class="stack-detail">Transactional email for welcome, password reset, and share notifications. React Email for templates.</div></div>
+  </div>
+
+  <h2>Backend Service Architecture</h2>
+  <div class="code-block">
+    <div class="cb-head"><div class="cb-dots"><div class="cbd r"></div><div class="cbd y"></div><div class="cbd g"></div></div><div class="cb-lang">Node.js + Express — server entry</div></div>
+    <pre>
+// apps/server/src/index.ts
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import { authRouter }     from './routes/auth';
+import { projectsRouter } from './routes/projects';
+import { sectionsRouter } from './routes/sections';
+import { exportRouter }   from './routes/export';
+import { adminRouter }    from './routes/admin';
+import { tenantGuard }    from './middleware/auth';
+import { rateLimiter }    from './middleware/rateLimit';
+
+const app = express();
+
+app.use(helmet());
+app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
+app.use(express.json({ limit: '2mb' }));
+app.use(rateLimiter);
+
+// Public routes
+app.use('/api/v1/auth', authRouter);
+
+// Protected routes (require valid JWT)
+app.use('/api/v1/projects',  tenantGuard, projectsRouter);
+app.use('/api/v1/sections',  tenantGuard, sectionsRouter);
+app.use('/api/v1/export',    tenantGuard, exportRouter);
+app.use('/api/v1/admin',     tenantGuard, adminRouter); // superadmin only
+
+app.listen(process.env.PORT || 3001, () => {
+  console.log(`Server running on port ${process.env.PORT || 3001}`);
+});</pre>
+  </div>
+
+  <h2>Key Middleware</h2>
+  <div class="code-block">
+    <div class="cb-head"><div class="cb-dots"><div class="cbd r"></div><div class="cbd y"></div><div class="cbd g"></div></div><div class="cb-lang">TypeScript — auth + RBAC middleware</div></div>
+    <pre>
+// middleware/auth.ts
+export const tenantGuard = async (req: Request, res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'No token provided' });
+  }
+
+  const token = authHeader.slice(7);
+  try {
+    const payload = await verifyJWT(token);
+    req.user = { id: payload.userId, role: payload.role };
+    next();
+  } catch {
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
+};
+
+// Role-based access control
+export const requireRole = (roles: string[]) =>
+  (req: Request, res: Response, next: NextFunction) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ error: 'Insufficient permissions' });
+    }
+    next();
+  };
+
+// Usage: router.get('/analytics', requireRole(['superadmin']), handler)</pre>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE: PROJECT STRUCTURE
+══════════════════════════════════════════════════════ -->
+<div class="page" id="page-structure">
+  <div class="page-eyebrow">Monorepo — Turborepo</div>
+  <h1 class="page-title">Project <span>Structure</span></h1>
+  <p class="page-lead">Monorepo managed with Turborepo and pnpm workspaces. Shared types, DB schema, and UI components across the frontend and backend apps.</p>
+
+  <div class="tree-block">
+    <div class="tree-head"><div class="tree-dots"><div class="td r"></div><div class="td y"></div><div class="td g"></div></div></div>
+    <pre>
+<span class="tr-dir">docforge/</span>
+├── <span class="tr-file">turbo.json</span>                <span class="tr-cm"># Turborepo pipeline config</span>
+├── <span class="tr-file">package.json</span>              <span class="tr-cm"># pnpm workspaces root</span>
+├── <span class="tr-file">pnpm-workspace.yaml</span>
+├── <span class="tr-file">tsconfig.base.json</span>        <span class="tr-cm"># Shared TypeScript config</span>
+│
+├── <span class="tr-dir">apps/</span>
+│   ├── <span class="tr-dir">web/</span>                     <span class="tr-cm"># Next.js 14 frontend</span>
+│   │   ├── <span class="tr-dir">app/</span>
+│   │   │   ├── <span class="tr-dir">(marketing)/</span>     <span class="tr-cm"># Landing, pricing pages (SSR)</span>
+│   │   │   │   ├── <span class="tr-file">page.tsx</span>       <span class="tr-cm"># Landing page</span>
+│   │   │   │   └── <span class="tr-file">pricing/page.tsx</span>
+│   │   │   ├── <span class="tr-dir">app/</span>             <span class="tr-cm"># Main editor (CSR)</span>
+│   │   │   │   ├── <span class="tr-file">page.tsx</span>       <span class="tr-cm"># /app — doc creator</span>
+│   │   │   │   └── <span class="tr-file">[projectId]/page.tsx</span> <span class="tr-cm"># Saved project</span>
+│   │   │   ├── <span class="tr-dir">login/</span>
+│   │   │   ├── <span class="tr-dir">dashboard/</span>
+│   │   │   └── <span class="tr-dir">api/</span>             <span class="tr-cm"># Next.js API routes</span>
+│   │   │       ├── <span class="tr-file">auth/[...route]/route.ts</span>
+│   │   │       └── <span class="tr-file">webhook/stripe/route.ts</span>
+│   │   ├── <span class="tr-dir">components/</span>
+│   │   │   ├── <span class="tr-dir">editor/</span>          <span class="tr-cm"># Main doc editor components</span>
+│   │   │   │   ├── <span class="tr-file">IconNav.tsx</span>
+│   │   │   │   ├── <span class="tr-file">SectionPanel.tsx</span>
+│   │   │   │   ├── <span class="tr-file">OutputPanel.tsx</span>
+│   │   │   │   ├── <span class="tr-file">DocBlock.tsx</span>    <span class="tr-cm"># Editable section block</span>
+│   │   │   │   └── <span class="tr-file">StreamView.tsx</span>
+│   │   │   ├── <span class="tr-dir">panels/</span>          <span class="tr-cm"># One file per section form</span>
+│   │   │   │   ├── <span class="tr-file">OverviewPanel.tsx</span>
+│   │   │   │   ├── <span class="tr-file">DesignPanel.tsx</span>
+│   │   │   │   ├── <span class="tr-file">DatabasePanel.tsx</span>
+│   │   │   │   └── <span class="tr-cm">... (one per section)</span>
+│   │   │   └── <span class="tr-dir">ui/</span>              <span class="tr-cm"># Reusable primitives</span>
+│   │   ├── <span class="tr-dir">lib/</span>
+│   │   │   ├── <span class="tr-file">gemini.ts</span>        <span class="tr-cm"># streamGemini() + prompt builders</span>
+│   │   │   ├── <span class="tr-file">prompts.ts</span>       <span class="tr-cm"># All section prompt templates</span>
+│   │   │   ├── <span class="tr-file">download.ts</span>      <span class="tr-cm"># downloadDoc() + HTML serializer</span>
+│   │   │   └── <span class="tr-file">store.ts</span>         <span class="tr-cm"># Zustand global state</span>
+│   │   ├── <span class="tr-file">middleware.ts</span>          <span class="tr-cm"># Auth route protection</span>
+│   │   ├── <span class="tr-file">next.config.mjs</span>
+│   │   └── <span class="tr-file">tailwind.config.ts</span>
+│   │
+│   └── <span class="tr-dir">server/</span>                  <span class="tr-cm"># Node.js + Express API (v2)</span>
+│       ├── <span class="tr-dir">src/</span>
+│       │   ├── <span class="tr-file">index.ts</span>           <span class="tr-cm"># Express app entry</span>
+│       │   ├── <span class="tr-dir">routes/</span>            <span class="tr-cm"># auth, projects, sections, export, admin</span>
+│       │   ├── <span class="tr-dir">middleware/</span>        <span class="tr-cm"># auth, rbac, rateLimit, validate</span>
+│       │   └── <span class="tr-dir">services/</span>
+│       │       ├── <span class="tr-file">r2.ts</span>            <span class="tr-cm"># Cloudflare R2 upload/presign</span>
+│       │       ├── <span class="tr-file">email.ts</span>         <span class="tr-cm"># Resend email service</span>
+│       │       └── <span class="tr-file">stripe.ts</span>        <span class="tr-cm"># Stripe billing (v2)</span>
+│       └── <span class="tr-file">tsconfig.json</span>
+│
+└── <span class="tr-dir">packages/</span>
+    ├── <span class="tr-dir">db/</span>                      <span class="tr-cm"># Drizzle schema + migrations</span>
+    │   ├── <span class="tr-file">schema/</span>              <span class="tr-cm"># users, projects, sections, exports</span>
+    │   ├── <span class="tr-file">migrations/</span>
+    │   ├── <span class="tr-file">index.ts</span>             <span class="tr-cm"># db client export</span>
+    │   └── <span class="tr-file">drizzle.config.ts</span>
+    ├── <span class="tr-dir">shared/</span>                  <span class="tr-cm"># Types, enums, Zod schemas</span>
+    │   ├── <span class="tr-file">types.ts</span>
+    │   ├── <span class="tr-file">enums.ts</span>             <span class="tr-cm"># SectionType, ProjectType, Plan</span>
+    │   └── <span class="tr-file">schemas.ts</span>           <span class="tr-cm"># Zod validation schemas</span>
+    └── <span class="tr-dir">email/</span>                   <span class="tr-cm"># React Email templates</span>
+        ├── <span class="tr-file">WelcomeEmail.tsx</span>
+        └── <span class="tr-file">ShareNotification.tsx</span></pre>
+  </div>
+
+  <h2>Environment Variables</h2>
+  <table class="env-table">
+    <thead><tr><th>Variable</th><th>Description</th><th>Required</th></tr></thead>
+    <tbody>
+      <tr><td class="env-key">NEXT_PUBLIC_APP_URL</td><td class="env-desc">Full URL of the frontend (https://docforge.app)</td><td><span class="env-req">REQUIRED</span></td></tr>
+      <tr><td class="env-key">DATABASE_URL</td><td class="env-desc">Neon PostgreSQL connection string with pgBouncer pooler URL</td><td><span class="env-req">v2</span></td></tr>
+      <tr><td class="env-key">JWT_SECRET</td><td class="env-desc">Secret for signing JWT access tokens (min 32 chars, RS256)</td><td><span class="env-req">v2</span></td></tr>
+      <tr><td class="env-key">REFRESH_SECRET</td><td class="env-desc">Separate secret for refresh token signing and validation</td><td><span class="env-req">v2</span></td></tr>
+      <tr><td class="env-key">CF_ACCOUNT_ID</td><td class="env-desc">Cloudflare account ID for R2 storage access</td><td><span class="env-req">v2</span></td></tr>
+      <tr><td class="env-key">CF_R2_ACCESS_KEY</td><td class="env-desc">R2 API access key ID (from Cloudflare dashboard)</td><td><span class="env-req">v2</span></td></tr>
+      <tr><td class="env-key">CF_R2_SECRET_KEY</td><td class="env-desc">R2 API secret access key</td><td><span class="env-req">v2</span></td></tr>
+      <tr><td class="env-key">CF_R2_BUCKET</td><td class="env-desc">R2 bucket name for exported HTML files (e.g. docforge-exports)</td><td><span class="env-req">v2</span></td></tr>
+      <tr><td class="env-key">RESEND_API_KEY</td><td class="env-desc">Resend API key for transactional email delivery</td><td><span class="env-req">v2</span></td></tr>
+      <tr><td class="env-key">STRIPE_SECRET_KEY</td><td class="env-desc">Stripe secret key for Pro plan subscriptions</td><td><span class="env-req">v2</span></td></tr>
+      <tr><td class="env-key">STRIPE_WEBHOOK_SECRET</td><td class="env-desc">Stripe webhook signing secret for payment event verification</td><td><span class="env-req">v2</span></td></tr>
+      <tr><td class="env-key">NEXT_PUBLIC_API_URL</td><td class="env-desc">Backend API base URL (https://api.docforge.app/api/v1)</td><td><span class="env-req">v2</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE: GEMINI INTEGRATION
+══════════════════════════════════════════════════════ -->
+<div class="page" id="page-gemini">
+  <div class="page-eyebrow">Google AI</div>
+  <h1 class="page-title">Gemini <span>Integration</span></h1>
+  <p class="page-lead">DocForge calls the Gemini API directly from the browser using the user's own API key. Server-Sent Events (SSE) streaming is used for all generation calls so users see the AI writing in real time.</p>
+
+  <h2>Available Models</h2>
+  <div class="db-grid">
+    <div class="db-card">
+      <div class="db-head" style="background:var(--blue-dim);color:#93c5fd;border-bottom-color:rgba(59,130,246,0.15)">gemini-2.5-flash ★</div>
+      <div class="db-row"><span class="db-col">Speed</span><span class="db-type">Fast</span></div>
+      <div class="db-row"><span class="db-col">Quality</span><span class="db-type">Excellent</span></div>
+      <div class="db-row"><span class="db-col">Context</span><span class="db-type">1M tokens</span></div>
+      <div class="db-row"><span class="db-col">Free RPM</span><span class="db-type">10/min</span></div>
+      <div class="db-row"><span class="db-col">Use case</span><span class="db-type">Default / recommended</span></div>
+    </div>
+    <div class="db-card">
+      <div class="db-head">gemini-2.5-flash-lite</div>
+      <div class="db-row"><span class="db-col">Speed</span><span class="db-type">Fastest</span></div>
+      <div class="db-row"><span class="db-col">Quality</span><span class="db-type">Good</span></div>
+      <div class="db-row"><span class="db-col">Context</span><span class="db-type">1M tokens</span></div>
+      <div class="db-row"><span class="db-col">Free RPM</span><span class="db-type">7/min</span></div>
+      <div class="db-row"><span class="db-col">Use case</span><span class="db-type">High volume / quick</span></div>
+    </div>
+    <div class="db-card">
+      <div class="db-head">gemini-2.5-pro</div>
+      <div class="db-row"><span class="db-col">Speed</span><span class="db-type">Slower</span></div>
+      <div class="db-row"><span class="db-col">Quality</span><span class="db-type">Best</span></div>
+      <div class="db-row"><span class="db-col">Context</span><span class="db-type">2M tokens</span></div>
+      <div class="db-row"><span class="db-col">Free RPM</span><span class="db-type">2/min</span></div>
+      <div class="db-row"><span class="db-col">Use case</span><span class="db-type">Max quality docs</span></div>
+    </div>
+    <div class="db-card">
+      <div class="db-head">gemini-2.0-flash</div>
+      <div class="db-row"><span class="db-col">Speed</span><span class="db-type">Fast</span></div>
+      <div class="db-row"><span class="db-col">Quality</span><span class="db-type">Good</span></div>
+      <div class="db-row"><span class="db-col">Context</span><span class="db-type">1M tokens</span></div>
+      <div class="db-row"><span class="db-col">Free RPM</span><span class="db-type">15/min</span></div>
+      <div class="db-row"><span class="db-col">Use case</span><span class="db-type">Stable fallback</span></div>
+    </div>
+  </div>
+
+  <h2>Prompt Engineering Strategy</h2>
+  <p>Each section has a dedicated prompt builder function in <code>lib/prompts.ts</code>. All prompts follow the same structure:</p>
+  <div class="code-block">
+    <div class="cb-head"><div class="cb-dots"><div class="cbd r"></div><div class="cbd y"></div><div class="cbd g"></div></div><div class="cb-lang">Prompt structure pattern</div></div>
+    <pre>
+// lib/prompts.ts
+
+export function buildOverviewPrompt(data: OverviewFormData): string {
+  return `You are a senior technical writer. Write a professional project overview.
+
+PROJECT DETAILS:
+Name: ${data.name}
+Tagline: ${data.tagline}
+Type: ${data.type} | Platform: ${data.platform}
+Purpose: ${data.what}
+Target users: ${data.users}
+Problem solved: ${data.problem}
+Key features:
+${data.features}
+Tech stack: ${data.stack}
+Version: ${data.version} | Stage: ${data.stage}
+
+Write a comprehensive, professional overview with these sections:
+1. Executive Summary (3 paragraphs — what, why, for whom)
+2. Problem Statement (the pain point addressed, with specifics)
+3. Solution Overview (how this solves the problem)
+4. Key Features (formatted list with 1-2 sentence descriptions each)
+5. Target Users (personas and their primary needs)
+6. Technology Overview (brief rationale for chosen tech)
+
+Style: Clear, professional, specific to THIS project. No generic filler.
+No markdown headers — clean paragraphs with clear labels.
+Length: Detailed and comprehensive, minimum 600 words.`;
+}
+
+// Each section has its own builder:
+// buildDesignPrompt(), buildFrontendPrompt(), buildDatabasePrompt(),
+// buildApiPrompt(), buildWorkflowPrompt(), buildAuthPrompt(),
+// buildTestingPrompt(), buildDeploymentPrompt(), buildFeaturesPrompt()</pre>
+  </div>
+
+  <h2>Error Handling</h2>
+  <div class="code-block">
+    <div class="cb-head"><div class="cb-dots"><div class="cbd r"></div><div class="cbd y"></div><div class="cbd g"></div></div><div class="cb-lang">TypeScript — Gemini error types</div></div>
+    <pre>
+// Common Gemini API errors and how DocForge handles them:
+
+// 400 Bad Request — malformed prompt or content policy
+// → Show user-friendly message, keep form data intact
+
+// 401 Unauthorized — invalid API key
+// → Set API key indicator to red, prompt user to check key at aistudio.google.com
+
+// 429 Too Many Requests — rate limit hit
+// → Show "Rate limit reached. Wait 60 seconds or switch to Flash Lite model."
+//   Display retry countdown timer
+
+// 500 Server Error — Gemini service issue
+// → "Google AI is temporarily unavailable. Try again in a moment."
+
+async function handleGeminiError(error: Error, response?: Response): Promise&lt;string&gt; {
+  if (response?.status === 401) return 'Invalid API key — check aistudio.google.com';
+  if (response?.status === 429) return 'Rate limit hit — wait 60s or switch model';
+  if (response?.status === 400) return 'Request blocked — try rephrasing your description';
+  return error.message || 'Generation failed — please try again';
+}</pre>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE: DEPLOYMENT
+══════════════════════════════════════════════════════ -->
+<div class="page" id="page-deployment">
+  <div class="page-eyebrow">Production Infrastructure</div>
+  <h1 class="page-title"><span>Deployment</span> Guide</h1>
+  <p class="page-lead">v1 deploys as a pure frontend on Vercel — zero backend required. v2 adds a Railway-hosted Express backend and Neon PostgreSQL. CI/CD via GitHub Actions with automatic deployments on main branch push.</p>
+
+  <h2>v1 Infrastructure (Current)</h2>
+  <div class="stack-grid">
+    <div class="stack-item"><div class="stack-layer">Frontend</div><div class="stack-tech">Vercel</div><div class="stack-detail">Next.js 14 auto-detected. Edge network CDN. Preview deployments on every PR. Zero config deployment from GitHub.</div></div>
+    <div class="stack-item"><div class="stack-layer">Domain</div><div class="stack-tech">Vercel Domains</div><div class="stack-detail">Custom domain (docforge.app) configured in Vercel dashboard. Automatic HTTPS via Let's Encrypt. CNAME to vercel DNS.</div></div>
+    <div class="stack-item"><div class="stack-layer">Storage</div><div class="stack-tech">Cloudflare R2</div><div class="stack-detail">Exported HTML files stored in R2 for cloud save feature. Presigned URLs for direct browser upload from v2 onward.</div></div>
+  </div>
+
+  <h2>v2 Infrastructure</h2>
+  <div class="stack-grid">
+    <div class="stack-item"><div class="stack-layer">Frontend</div><div class="stack-tech">Vercel</div><div class="stack-detail">Same as v1. Environment variables set in Vercel dashboard. Production + Preview environments.</div></div>
+    <div class="stack-item"><div class="stack-layer">Backend API</div><div class="stack-tech">Railway</div><div class="stack-detail">Node.js Express server. Auto-deploy from GitHub. Health check at /health. 512MB RAM starter. Scale up as needed.</div></div>
+    <div class="stack-item"><div class="stack-layer">Database</div><div class="stack-tech">Neon PostgreSQL</div><div class="stack-detail">Serverless PostgreSQL. Auto-suspend after 5min inactivity. pgBouncer connection pooling via Neon's pooler URL. Free tier for development.</div></div>
+    <div class="stack-item"><div class="stack-layer">Storage</div><div class="stack-tech">Cloudflare R2</div><div class="stack-detail">Exported HTML docs, user avatars, project thumbnails. AWS S3-compatible API. Zero egress fees. 10GB free storage.</div></div>
+    <div class="stack-item"><div class="stack-layer">Email</div><div class="stack-tech">Resend</div><div class="stack-detail">Transactional email. 3,000 emails/month free. Custom domain sending (notifications@docforge.app). React Email templates.</div></div>
+    <div class="stack-item"><div class="stack-layer">Payments</div><div class="stack-tech">Stripe</div><div class="stack-detail">Pro plan subscriptions. Stripe Checkout for upgrade flow. Webhook at /api/webhook/stripe handles subscription events.</div></div>
+  </div>
+
+  <h2>CI/CD Pipeline (GitHub Actions)</h2>
+  <div class="code-block">
+    <div class="cb-head"><div class="cb-dots"><div class="cbd r"></div><div class="cbd y"></div><div class="cbd g"></div></div><div class="cb-lang">YAML — .github/workflows/deploy.yml</div></div>
+    <pre>
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm run typecheck
+      - run: pnpm run lint
+      - run: pnpm run test
+      - run: pnpm run build
+
+  deploy-frontend:
+    needs: test-and-build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+
+  deploy-backend:
+    needs: test-and-build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: bervProject/railway-deploy@main
+        with:
+          railway-token: ${{ secrets.RAILWAY_TOKEN }}
+          service: docforge-api</pre>
+  </div>
+
+  <h2>Database Migrations</h2>
+  <div class="code-block">
+    <div class="cb-head"><div class="cb-dots"><div class="cbd r"></div><div class="cbd y"></div><div class="cbd g"></div></div><div class="cb-lang">Shell — database migration commands</div></div>
+    <pre>
+# Generate migration from schema changes
+pnpm --filter @docforge/db drizzle-kit generate
+
+# Apply migrations to Neon database
+pnpm --filter @docforge/db drizzle-kit migrate
+
+# Open Drizzle Studio (visual DB browser)
+pnpm --filter @docforge/db drizzle-kit studio
+
+# Push schema directly (dev only, no migration file)
+pnpm --filter @docforge/db drizzle-kit push</pre>
+  </div>
+
+  <h2>Deployment Checklist</h2>
+  <div class="success-box">
+    <strong>Before every production deploy:</strong><br>
+    ✓ All tests passing (pnpm run test)<br>
+    ✓ TypeScript compiles without errors (pnpm run typecheck)<br>
+    ✓ No lint errors (pnpm run lint)<br>
+    ✓ Environment variables set in Vercel + Railway dashboards<br>
+    ✓ Database migrations applied to production Neon instance<br>
+    ✓ Stripe webhook URL updated if backend URL changed<br>
+    ✓ CORS origin updated in backend to match new frontend URL
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE: EXTRA FEATURES
+══════════════════════════════════════════════════════ -->
+<div class="page" id="page-features">
+  <div class="page-eyebrow">Product Roadmap</div>
+  <h1 class="page-title">Extra <span>Features</span></h1>
+  <p class="page-lead">Features planned beyond the v1 core. These are real-world product enhancements that would increase retention, revenue, and make DocForge genuinely useful as a long-term tool.</p>
+
+  <div class="feat-grid">
+
+    <div class="feat-card">
+      <div class="feat-cat" style="color:var(--blue)">Cloud Persistence</div>
+      <div class="feat-name">Cloud Save & Sync</div>
+      <div class="feat-desc">Pro users can save documentation projects to the cloud (Neon DB). Projects are accessible from any device. Auto-save on every content change with debouncing. Version history lets users roll back to any previous state.</div>
+    </div>
+
+    <div class="feat-card">
+      <div class="feat-cat" style="color:var(--teal)">Collaboration</div>
+      <div class="feat-name">Team Sharing</div>
+      <div class="feat-desc">Share a documentation project with teammates via an invite link. Shared users can view and edit. Comments on specific sections. Activity log showing who changed what and when. Perfect for dev teams.</div>
+    </div>
+
+    <div class="feat-card">
+      <div class="feat-cat" style="color:var(--green)">Publishing</div>
+      <div class="feat-name">Hosted Doc Pages</div>
+      <div class="feat-desc">Pro users can publish their documentation to a permanent URL (e.g. docs.docforge.app/username/project-name). Public or password-protected. Custom subdomain support. Auto-updates when the project is saved.</div>
+    </div>
+
+    <div class="feat-card">
+      <div class="feat-cat" style="color:var(--purple)">Templates</div>
+      <div class="feat-name">Project Templates</div>
+      <div class="feat-desc">Pre-built project templates for common types: Next.js SaaS, Mobile App (React Native), REST API, E-Commerce, etc. Templates pre-fill all form fields with sensible defaults and common patterns for that project type.</div>
+    </div>
+
+    <div class="feat-card">
+      <div class="feat-cat" style="color:var(--orange)">Export</div>
+      <div class="feat-name">Multiple Export Formats</div>
+      <div class="feat-desc">Beyond HTML: export to PDF (via Puppeteer on the server), Markdown (for GitHub READMEs), Notion import-compatible format, and Confluence Wiki markup. Each format is styled to match the export target's conventions.</div>
+    </div>
+
+    <div class="feat-card">
+      <div class="feat-cat" style="color:var(--cyan)">AI Enhancement</div>
+      <div class="feat-name">Regenerate Section</div>
+      <div class="feat-desc">After generating a section, user can click "Regenerate" to get a different AI-written version. Useful when the first output isn't quite right. Each regeneration uses the same form data but a different prompt variation for diversity.</div>
+    </div>
+
+    <div class="feat-card">
+      <div class="feat-cat" style="color:var(--pink)">AI Enhancement</div>
+      <div class="feat-name">AI Edit Mode</div>
+      <div class="feat-desc">Select any text in an editable block and ask the AI to rewrite, expand, shorten, or translate it. An inline prompt bar appears with the selection highlighted. AI rewrites only the selected text in context.</div>
+    </div>
+
+    <div class="feat-card">
+      <div class="feat-cat" style="color:var(--blue)">Onboarding</div>
+      <div class="feat-name">Import from GitHub</div>
+      <div class="feat-desc">Connect a GitHub repo and DocForge analyzes the codebase (README, package.json, folder structure) to pre-fill documentation forms automatically. AI infers tech stack, features, and architecture from the actual code.</div>
+    </div>
+
+    <div class="feat-card">
+      <div class="feat-cat" style="color:var(--green)">Analytics</div>
+      <div class="feat-name">Doc Usage Analytics</div>
+      <div class="feat-desc">For hosted doc pages: view how many people visited, which sections are most read, how long visitors spend on each section. Helps teams understand which parts of the documentation are most valuable.</div>
+    </div>
+
+    <div class="feat-card">
+      <div class="feat-cat" style="color:var(--orange)">Customization</div>
+      <div class="feat-name">Custom Themes</div>
+      <div class="feat-desc">Users can customize the output HTML's visual theme — change the accent color, switch to light mode, pick fonts, adjust spacing. The design system token inputs in the Design section feed directly into the exported HTML's CSS variables.</div>
+    </div>
+
+    <div class="feat-card">
+      <div class="feat-cat" style="color:var(--purple)">Integrations</div>
+      <div class="feat-name">Notion Export</div>
+      <div class="feat-desc">One-click export of all sections directly to a Notion database via the Notion API. Each section becomes a Notion page with proper headings. Pro feature. Requires OAuth connection to user's Notion workspace.</div>
+    </div>
+
+    <div class="feat-card">
+      <div class="feat-cat" style="color:var(--teal)">Monetization</div>
+      <div class="feat-name">Pro Plan (Stripe)</div>
+      <div class="feat-desc">Free: 10 docs/month, no cloud save. Pro ($9/month): unlimited docs, cloud save + sync, version history, hosted pages, all export formats, template library, team sharing (up to 3 members), priority support.</div>
+    </div>
+
+  </div>
+
+  <h2>Subscription Plans</h2>
+  <div class="perm-wrap">
+    <table class="perm-table">
+      <thead><tr><th>Feature</th><th>Free</th><th>Pro ($9/mo)</th></tr></thead>
+      <tbody>
+        <tr><td>Documentation generation</td><td style="text-align:center;color:var(--text2)">10/month</td><td style="text-align:center;color:var(--text2)">Unlimited</td></tr>
+        <tr><td>All 12 doc sections</td><td><span class="py">✓</span></td><td><span class="py">✓</span></td></tr>
+        <tr><td>Manual + AI modes</td><td><span class="py">✓</span></td><td><span class="py">✓</span></td></tr>
+        <tr><td>Download HTML</td><td><span class="py">✓</span></td><td><span class="py">✓</span></td></tr>
+        <tr><td>Cloud save & sync</td><td><span class="pn">✗</span></td><td><span class="py">✓</span></td></tr>
+        <tr><td>Version history</td><td><span class="pn">✗</span></td><td><span class="py">✓</span></td></tr>
+        <tr><td>Hosted doc pages</td><td><span class="pn">✗</span></td><td><span class="py">✓</span></td></tr>
+        <tr><td>PDF / Markdown export</td><td><span class="pn">✗</span></td><td><span class="py">✓</span></td></tr>
+        <tr><td>Project templates</td><td><span class="pn">✗</span></td><td><span class="py">✓</span></td></tr>
+        <tr><td>Team sharing (up to 3)</td><td><span class="pn">✗</span></td><td><span class="py">✓</span></td></tr>
+        <tr><td>GitHub import</td><td><span class="pn">✗</span></td><td><span class="py">✓</span></td></tr>
+        <tr><td>Priority support</td><td><span class="pn">✗</span></td><td><span class="py">✓</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+  </div><!-- /content-scroll -->
+</div><!-- /main -->
+
+</div><!-- /shell -->
+
+<script>
+const PAGES = {
+  overview:   { label:'Overview',            crumb:'Project Overview' },
+  workflow:   { label:'User Workflow',       crumb:'User Workflow' },
+  design:     { label:'Design System',       crumb:'Design System' },
+  roles:      { label:'Roles & Auth',        crumb:'Roles & Auth' },
+  database:   { label:'Database Schema',     crumb:'Database Schema' },
+  api:        { label:'API Routes',          crumb:'API Routes' },
+  frontend:   { label:'Frontend',            crumb:'Frontend Architecture' },
+  backend:    { label:'Backend',             crumb:'Backend Architecture' },
+  structure:  { label:'Project Structure',   crumb:'Project Structure' },
+  gemini:     { label:'Gemini Integration',  crumb:'Gemini Integration' },
+  deployment: { label:'Deployment',          crumb:'Deployment Guide' },
+  features:   { label:'Extra Features',      crumb:'Extra Features' },
+};
+
+function go(pageId, el) {
+  // Hide all pages
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+
+  // Show selected page
+  const page = document.getElementById(`page-${pageId}`);
+  if (page) page.classList.add('active');
+  if (el) el.classList.add('active');
+
+  // Update breadcrumb
+  const meta = PAGES[pageId] || {};
+  document.getElementById('breadcrumb').textContent = meta.crumb || pageId;
+
+  // Scroll to top
+  document.querySelector('.content-scroll').scrollTop = 0;
+
+  // Close mobile sidebar
+  closeSidebar();
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sbOverlay').classList.toggle('visible');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sbOverlay').classList.remove('visible');
+}
+</script>
+</body>
+</html>
