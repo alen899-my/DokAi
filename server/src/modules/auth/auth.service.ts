@@ -40,6 +40,11 @@ export async function loginService(input: LoginInput): Promise<AuthResult> {
   }
 
   // Compare passwords
+  if (!user.passwordHash) {
+    // This user registered via Google and doesn't have a password
+    throw new AppError('Invalid email or password', 401);
+  }
+
   const isPasswordValid = await comparePassword(password, user.passwordHash);
   if (!isPasswordValid) {
     throw new AppError('Invalid email or password', 401);
@@ -50,6 +55,8 @@ export async function loginService(input: LoginInput): Promise<AuthResult> {
     id:        user.id,
     name:      user.name,
     email:     user.email,
+    googleId:  user.googleId,
+    avatar:    user.avatar,
     plan:      user.plan,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
