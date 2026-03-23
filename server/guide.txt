@@ -1,0 +1,11 @@
+# 1. Install all packages
+npm install
+
+# 2. Generate migration files from schema
+npm run db:generate
+
+# 3. Apply migrations to Neon DB
+npm run db:migrate
+
+# 4. Start the dev server
+npm run dev

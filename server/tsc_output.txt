@@ -1,0 +1,3 @@
+error TS6059: File 'D:/New Projects/documenter/server/drizzle.config.ts' is not under 'rootDir' 'D:/New Projects/documenter/server/src'. 'rootDir' is expected to contain all source files.
+  The file is in the program because:
+    Matched by include pattern 'drizzle.config.ts' in 'D:/New Projects/documenter/server/tsconfig.json'
