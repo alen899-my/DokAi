@@ -28,6 +28,14 @@ app.use(express.urlencoded({ extended: true }));
 // ── Passport — must be after body parsing ──
 app.use(passport.initialize());
 
+// ── Root landing ──
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Welcome to DocForge API. Use /api/v1 for endpoints.',
+  });
+});
+
 // ── Health check ──
 app.get('/health', (req, res) => {
   res.json({
