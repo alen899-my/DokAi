@@ -326,7 +326,8 @@
     }
 
     /* ── Nav Item ── */
-    .saas-nav-item {
+    .saas-nav-item,
+    .saas-nav-item-active {
         @apply flex items-center gap-2.5
                text-sm font-medium text-muted-foreground
                px-3 py-2 rounded-md w-full
@@ -335,12 +336,18 @@
     }
 
     .saas-nav-item-active {
-        @apply saas-nav-item bg-secondary text-secondary-foreground;
+        @apply bg-secondary text-secondary-foreground;
     }
 
     /* ── Stat Card ── */
     .saas-stat-card {
-        @apply saas-card p-5;
+        @apply bg-card border border-border rounded-lg p-5;
+        box-shadow: var(--shadow-sm);
+        transition: box-shadow 0.2s ease, transform 0.2s ease;
+    }
+
+    .saas-stat-card:hover {
+        box-shadow: var(--shadow-md);
     }
 
     /* ── Divider ── */
