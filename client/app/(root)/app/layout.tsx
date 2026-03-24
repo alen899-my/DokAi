@@ -38,7 +38,7 @@ export default function RootLayout({
   }
 
   return (
-    <div className="flex h-screen bg-white overflow-hidden">
+    <div className="flex h-screen bg-white overflow-hidden text-black">
 
       {/* Sidebar */}
       <Sidebar

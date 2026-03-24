@@ -52,7 +52,7 @@ export default function NewProjectPage() {
         <div className="inline-block bg-black text-yellow-300 font-black text-xs uppercase tracking-widest px-3 py-1.5 mb-3">
           AI Full Generate Mode
         </div>
-        <h2 className="font-black text-3xl sm:text-4xl tracking-tighter">
+        <h2 className="text-black font-black text-3xl sm:text-4xl tracking-tighter">
           Create New Project
         </h2>
         <p className="text-black/60 font-medium text-sm mt-2 max-w-xl">
@@ -65,7 +65,7 @@ export default function NewProjectPage() {
           <div className="flex flex-col gap-6">
             
             <div>
-              <label className="block font-black text-sm uppercase tracking-wider mb-2">
+              <label className="block text-black font-black text-sm uppercase tracking-wider mb-2">
                 AI Model
               </label>
               <div className="relative">
@@ -87,7 +87,7 @@ export default function NewProjectPage() {
             </div>
 
             <div>
-              <label className="block font-black text-sm uppercase tracking-wider mb-2">
+              <label className="block text-black font-black text-sm uppercase tracking-wider mb-2">
                 Project Idea & Description <span className="text-red-500">*</span>
               </label>
               <textarea
