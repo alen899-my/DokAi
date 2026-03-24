@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { authFetch, apiUrl } from "@/lib/authFetch";
 
 interface Project {
   id: string;
@@ -18,8 +19,7 @@ export default function AppPage() {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
-        const res = await fetch(`${apiUrl}/projects`);
+        const res = await authFetch(apiUrl("/projects"));
         if (res.ok) {
           const data = await res.json();
           setProjects(data.projects || []);
@@ -35,9 +35,8 @@ export default function AppPage() {
 
   const handleDeleteProject = async (id: string) => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
-      const res = await fetch(`${apiUrl}/projects/${id}`, {
-        method: "DELETE"
+      const res = await authFetch(apiUrl(`/projects/${id}`), {
+        method: "DELETE",
       });
       if (res.ok) {
         setProjects(prev => prev.filter(p => p.id !== id));

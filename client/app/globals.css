@@ -420,3 +420,10 @@
         background: var(--green-400);
     }
 }
+
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}

@@ -32,5 +32,5 @@ export const env = {
   GOOGLE_CLIENT_SECRET: requireEnv('GOOGLE_CLIENT_SECRET'),
   GOOGLE_CALLBACK_URL:  process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3001/api/v1/auth/google/callback',
   FRONTEND_CALLBACK_URL:process.env.FRONTEND_CALLBACK_URL || 'http://localhost:3000/auth/callback',
-  GEMINI_API_KEY:       requireEnv('GEMINI_API_KEY'),
+  GROQ_API_KEY: requireEnv('GROQ_API_KEY'),
 };

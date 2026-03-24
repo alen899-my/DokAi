@@ -3,36 +3,39 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { authFetch, apiUrl } from "@/lib/authFetch";
 
 export default function NewProjectPage() {
   const router = useRouter();
   
 
-  const [model, setModel] = useState("gemini-2.5-flash");
+  const [model, setModel] = useState("llama-3.3-70b-versatile");
   const [idea, setIdea] = useState("");
+  const [targetAudience, setTargetAudience] = useState("");
+  const [coreFeatures, setCoreFeatures] = useState("");
+  const [techStack, setTechStack] = useState("");
+  
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedContent, setGeneratedContent] = useState("");
-  const [projectId, setProjectId] = useState<string | null>(null);
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!idea.trim()) return;
 
+    const fullPrompt = `Project Idea:\n${idea.trim()}\n\n${targetAudience ? `Target Audience:\n${targetAudience.trim()}\n\n` : ''}${coreFeatures ? `Core Features:\n${coreFeatures.trim()}\n\n` : ''}${techStack ? `Tech Stack Preferences:\n${techStack.trim()}` : ''}`;
+
     setIsGenerating(true);
     
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
-      
-      const response = await fetch(`${apiUrl}/projects`, {
+      const response = await authFetch(apiUrl("/projects"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idea, model }),
+        body: JSON.stringify({ idea: fullPrompt, model }),
       });
 
       if (!response.ok) throw new Error("Failed to start project creation");
-      
+
       const data = await response.json();
-      
+
       // Navigate instantly to the isolated project viewer, telling it to stream
       router.push(`/projects/${data.id}?stream=true`);
 
@@ -63,7 +66,7 @@ export default function NewProjectPage() {
             
             <div>
               <label className="block font-black text-sm uppercase tracking-wider mb-2">
-                AI Model (Free Tier Recommended)
+                AI Model
               </label>
               <div className="relative">
                 <select
@@ -71,11 +74,11 @@ export default function NewProjectPage() {
                   onChange={(e) => setModel(e.target.value)}
                   className="w-full appearance-none border-2 border-black p-3 pr-10 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-yellow-300 cursor-pointer bg-white"
                 >
-                  <option value="gemini-2.5-flash">Gemini 2.5 Flash (Fast & Free)</option>
-                  <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite (Ultra Fast)</option>
-                  <option value="gemini-2.0-flash">Gemini 2 Flash</option>
-                  <option value="gemini-2.0-flash-lite">Gemini 2 Flash Lite</option>
-                  <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                  <option value="llama-3.3-70b-versatile">Llama 3.3 70B Versatile (Recommended)</option>
+                  <option value="llama-3.1-70b-versatile">Llama 3.1 70B</option>
+                  <option value="llama3-8b-8192">Llama 3 8B (Ultra Fast)</option>
+                  <option value="mixtral-8x7b-32768">Mixtral 8x7B (Long Context)</option>
+                  <option value="gemma2-9b-it">Gemma 2 9B</option>
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-black border-l-2 border-black">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -85,18 +88,56 @@ export default function NewProjectPage() {
 
             <div>
               <label className="block font-black text-sm uppercase tracking-wider mb-2">
-                Project Idea & Description
+                Project Idea & Description <span className="text-red-500">*</span>
               </label>
-              <p className="text-xs text-black/60 font-medium mb-3">
-                What does it do? Who uses it? What tech stack are you planning to use? The more detail you provide, the better the generated documentation will be.
-              </p>
               <textarea
                 value={idea}
                 onChange={(e) => setIdea(e.target.value)}
-                rows={8}
+                rows={4}
                 className="w-full border-2 border-black p-4 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-yellow-300 resize-y shadow-inner text-black placeholder:text-black/30 bg-white"
                 placeholder="e.g. A SaaS platform for dog walkers to manage their schedules and clients..."
                 required
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block font-black text-xs uppercase tracking-wider mb-2 text-black/80">
+                  Target Audience (Optional)
+                </label>
+                <textarea
+                  value={targetAudience}
+                  onChange={(e) => setTargetAudience(e.target.value)}
+                  rows={3}
+                  className="w-full border-2 border-black p-3 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-yellow-300 resize-y text-black placeholder:text-black/30"
+                  placeholder="e.g. Freelance designers, Small enterprise HR teams"
+                />
+              </div>
+
+              <div>
+                <label className="block font-black text-xs uppercase tracking-wider mb-2 text-black/80">
+                  Tech Stack Preferences (Optional)
+                </label>
+                <textarea
+                  value={techStack}
+                  onChange={(e) => setTechStack(e.target.value)}
+                  rows={3}
+                  className="w-full border-2 border-black p-3 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-yellow-300 resize-y text-black placeholder:text-black/30"
+                  placeholder="e.g. Next.js frontend, PostgreSQL, TailwindCSS"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block font-black text-xs uppercase tracking-wider mb-2 text-black/80">
+                Core Features (Optional)
+              </label>
+              <textarea
+                value={coreFeatures}
+                onChange={(e) => setCoreFeatures(e.target.value)}
+                rows={3}
+                className="w-full border-2 border-black p-3 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-yellow-300 resize-y text-black placeholder:text-black/30"
+                placeholder="e.g. Stripe billing, secure file uploads, real-time chat"
               />
             </div>
 
