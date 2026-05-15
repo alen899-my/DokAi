@@ -33,4 +33,12 @@ export const env = {
   GOOGLE_CALLBACK_URL:  process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3001/api/v1/auth/google/callback',
   FRONTEND_CALLBACK_URL:process.env.FRONTEND_CALLBACK_URL || 'http://localhost:3000/auth/callback',
   GROQ_API_KEY: requireEnv('GROQ_API_KEY'),
+
+  // OpenRouter / AI
+  // NOTE: OPENROUTER_API_KEY is intentionally optional here to avoid breaking on environments
+  // where the AI integration is not configured. The OpenRouter service will throw if the key
+  // is required at runtime and not provided.
+  OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY || '',
+  OPENROUTER_BASE_URL: process.env.OPENROUTER_BASE_URL || 'https://api.openrouter.ai',
+  OPENROUTER_MODEL: process.env.OPENROUTER_MODEL || 'minimaxminimax/minimax-m2.5:free',
 };
