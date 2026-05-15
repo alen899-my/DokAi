@@ -5,12 +5,15 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 
 function CallbackHandler() {
-  const router       = useRouter();
+  const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
     async function handleCallback() {
-      const accessToken  = searchParams.get("accessToken");
+      // searchParams can be null initially; guard before calling .get
+      if (!searchParams) return;
+
+      const accessToken = searchParams.get("accessToken");
       const refreshToken = searchParams.get("refreshToken");
 
       if (!accessToken || !refreshToken) {
@@ -19,19 +22,16 @@ function CallbackHandler() {
       }
 
       // Store tokens first
-      localStorage.setItem("accessToken",  accessToken);
+      localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
 
       // Fetch user data using the access token
       try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/auth/me`,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
 
         const data = await res.json();
 
@@ -54,9 +54,7 @@ function CallbackHandler() {
     <div className="min-h-screen bg-white flex items-center justify-center">
       <div className="flex flex-col items-center gap-4">
         <div className="w-10 h-10 border-4 border-black border-t-yellow-300 rounded-full animate-spin" />
-        <p className="font-black text-sm uppercase tracking-widest text-black">
-          Signing you in...
-        </p>
+        <p className="font-black text-sm uppercase tracking-widest text-black">Signing you in...</p>
       </div>
     </div>
   );
@@ -64,11 +62,13 @@ function CallbackHandler() {
 
 export default function AuthCallbackPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-black border-t-yellow-300 rounded-full animate-spin" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-white flex items-center justify-center">
+          <div className="w-10 h-10 border-4 border-black border-t-yellow-300 rounded-full animate-spin" />
+        </div>
+      }
+    >
       <CallbackHandler />
     </Suspense>
   );
